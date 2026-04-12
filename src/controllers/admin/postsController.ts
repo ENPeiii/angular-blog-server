@@ -11,16 +11,16 @@ import {
   Tags,
   Response,
 } from "tsoa";
-import { CreatePostDto, Post as PostModel, UpdatePostDto } from "../models/post";
-import { PostsService } from "../services/postsService";
+import { CreatePostDto, Post as PostModel, UpdatePostDto } from "../../models/post";
+import { PostsService } from "../../services/postsService";
 
-@Route("posts")
-@Tags("Posts")
-export class PostsController extends Controller {
+@Route("api/admin/posts")
+@Tags("Admin - Posts")
+export class AdminPostsController extends Controller {
   private postsService = new PostsService();
 
   /**
-   * 取得所有文章
+   * 取得所有文章清單（含後台管理欄位）
    */
   @Get("/")
   public async getPosts(): Promise<PostModel[]> {
@@ -28,11 +28,12 @@ export class PostsController extends Controller {
   }
 
   /**
-   * 根據 ID 取得單篇文章
+   * 根據 ID 取得單篇文章（含後台管理欄位）
+   * @param id 文章 ID
    */
   @Get("{id}")
   @Response<{ message: string }>(404, "Post not found")
-  public async getPost(@Path() id: number): Promise<PostModel> {
+  public async getPost(@Path() id: string): Promise<PostModel> {
     const post = this.postsService.getById(id);
     if (!post) {
       this.setStatus(404);
@@ -42,7 +43,7 @@ export class PostsController extends Controller {
   }
 
   /**
-   * 建立新文章
+   * 新增一篇文章
    */
   @Post("/")
   @SuccessResponse(201, "Created")
@@ -52,12 +53,13 @@ export class PostsController extends Controller {
   }
 
   /**
-   * 更新文章
+   * 更新指定文章的內容（只傳要修改的欄位即可）
+   * @param id 文章 ID
    */
   @Put("{id}")
   @Response<{ message: string }>(404, "Post not found")
   public async updatePost(
-    @Path() id: number,
+    @Path() id: string,
     @Body() body: UpdatePostDto
   ): Promise<PostModel> {
     const post = this.postsService.update(id, body);
@@ -69,12 +71,13 @@ export class PostsController extends Controller {
   }
 
   /**
-   * 刪除文章
+   * 刪除指定文章
+   * @param id 文章 ID
    */
   @Delete("{id}")
   @SuccessResponse(204, "Deleted")
   @Response<{ message: string }>(404, "Post not found")
-  public async deletePost(@Path() id: number): Promise<void> {
+  public async deletePost(@Path() id: string): Promise<void> {
     const success = this.postsService.delete(id);
     if (!success) {
       this.setStatus(404);

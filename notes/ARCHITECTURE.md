@@ -9,21 +9,23 @@
 1. [整體架構概覽](#1-整體架構概覽)
 2. [技術棧說明](#2-技術棧說明)
 3. [專案資料夾結構](#3-專案資料夾結構)
-4. [資料流程：一個請求的旅程](#4-資料流程一個請求的旅程)
-5. [各檔案詳解](#5-各檔案詳解)
-   - [models/post.ts — 資料形狀](#51-modelspostts--資料形狀)
-   - [services/postsService.ts — 業務邏輯](#52-servicespostsservicets--業務邏輯)
-   - [controllers/postsController.ts — API 端點](#53-controllerspostscontrollerts--api-端點)
-   - [app.ts — Express 應用程式](#54-appts--express-應用程式)
-   - [server.ts — 啟動入口](#55-serverts--啟動入口)
-6. [設定檔說明](#6-設定檔說明)
-   - [tsconfig.json](#61-tsconfigjson)
-   - [tsoa.json](#62-tsoajson)
-7. [Tsoa 是什麼？它幫了什麼？](#7-tsoa-是什麼它幫了什麼)
-8. [API 文件工具：Swagger UI vs ReDoc](#8-api-文件工具swagger-ui-vs-redoc)
-9. [HTTP 狀態碼對照表](#9-http-狀態碼對照表)
-10. [開發指令說明](#10-開發指令說明)
-11. [接下來可以做什麼](#11-接下來可以做什麼)
+4. [前後台 API 分離設計](#4-前後台-api-分離設計)
+5. [資料流程：一個請求的旅程](#5-資料流程一個請求的旅程)
+6. [各檔案詳解](#6-各檔案詳解)
+   - [models/post.ts — 資料形狀](#61-modelspostts--資料形狀)
+   - [services/postsService.ts — 業務邏輯](#62-servicespostsservicets--業務邏輯)
+   - [controllers/ — API 端點](#63-controllers--api-端點)
+   - [middleware/auth.ts — 後台驗證](#64-middlewareauthts--後台驗證)
+   - [app.ts — Express 應用程式](#65-appts--express-應用程式)
+   - [server.ts — 啟動入口](#66-serverts--啟動入口)
+7. [設定檔說明](#7-設定檔說明)
+   - [tsconfig.json](#71-tsconfigjson)
+   - [tsoa.json](#72-tsoajson)
+8. [Tsoa 是什麼？它幫了什麼？](#8-tsoa-是什麼它幫了什麼)
+9. [API 文件工具：Swagger UI vs ReDoc](#9-api-文件工具swagger-ui-vs-redoc)
+10. [HTTP 狀態碼對照表](#10-http-狀態碼對照表)
+11. [開發指令說明](#11-開發指令說明)
+12. [接下來可以做什麼](#12-接下來可以做什麼)
 
 ---
 
@@ -74,35 +76,54 @@
 ```
 angular-blog-server/
 │
-├── src/                          ← 所有原始碼在這裡
+├── src/
 │   ├── models/
-│   │   └── post.ts               ← 定義資料長什麼樣子 (TypeScript interface)
+│   │   ├── post.ts               ← 定義 Post 資料形狀
+│   │   └── tag.ts                ← 定義 Tag 資料形狀
 │   │
 │   ├── services/
-│   │   └── postsService.ts       ← 業務邏輯：CRUD 實際怎麼操作資料
+│   │   ├── postsService.ts       ← Post CRUD 邏輯（記憶體版）
+│   │   ├── postsService.db.ts    ← Post CRUD 邏輯（PostgreSQL 版，備用）
+│   │   └── tagsService.ts        ← Tag CRUD 邏輯
 │   │
 │   ├── controllers/
-│   │   └── postsController.ts    ← API 端點：哪個 URL 對應哪個功能
+│   │   ├── public/               ← 前台：只有讀取，不需要登入
+│   │   │   ├── postsController.ts  (@Route("api/public/posts"))
+│   │   │   └── tagsController.ts   (@Route("api/public/tags"))
+│   │   └── admin/                ← 後台：完整 CRUD，需要 Authorization header
+│   │       ├── postsController.ts  (@Route("api/admin/posts"))
+│   │       └── tagsController.ts   (@Route("api/admin/tags"))
+│   │
+│   ├── middleware/
+│   │   └── auth.ts               ← 後台身份驗證，檢查 Authorization header
 │   │
 │   ├── lib/
 │   │   └── prisma.ts             ← Prisma Client 單例（接資料庫時用）
 │   ├── routes.ts                 ← ⚠️ 自動產生，不要手動修改
-│   ├── app.ts                    ← 建立 Express app、掛載 Swagger UI 和 ReDoc
+│   ├── app.ts                    ← Express 設定：掛載 middleware、文件、路由
 │   └── server.ts                 ← 啟動伺服器（監聽 port）
 │
 ├── public/
-│   └── swagger.json              ← ⚠️ 自動產生，Swagger UI / ReDoc 共用的規格檔
+│   └── swagger.json              ← ⚠️ 自動產生，Swagger UI / ReDoc 共用
+│
+├── prisma/
+│   └── schema.prisma             ← 資料庫 schema（接 PostgreSQL 時用）
+│
+├── notes/                        ← 學習筆記
+│   ├── ARCHITECTURE.md           ← 這份文件
+│   ├── new-resource.md           ← 新增 API 資源的步驟
+│   └── DB_GUIDE.md               ← 接 PostgreSQL 的步驟
 │
 ├── tsoa.json                     ← Tsoa 的設定
 ├── tsconfig.json                 ← TypeScript 的設定
-├── nodemon.json                  ← 開發時自動重啟的設定
-└── package.json                  ← 專案設定與指令
+└── package.json
 ```
 
 **哪些檔案你會常常改：**
 - `src/models/` — 新增或修改資料結構
 - `src/services/` — 新增或修改業務邏輯
-- `src/controllers/` — 新增或修改 API 端點
+- `src/controllers/public/` — 新增或修改前台 API
+- `src/controllers/admin/` — 新增或修改後台 API
 
 **哪些檔案不要手動改：**
 - `src/routes.ts` — Tsoa 自動產生
@@ -110,33 +131,75 @@ angular-blog-server/
 
 ---
 
-## 4. 資料流程：一個請求的旅程
+## 4. 前後台 API 分離設計
 
-以「新增一篇文章」為例，`POST /posts`：
+所有 API 都掛在 `/api/` 前綴下，再依身份分為兩組：
+
+```
+/api/public/*   → 前台，任何人都能存取（不需要登入）
+/api/admin/*    → 後台，需要在 Header 帶上 Authorization token
+```
+
+**完整 API 路徑對照：**
+
+| 動作 | 前台（公開） | 後台（需登入） |
+|------|------------|--------------|
+| 取得所有文章 | GET `/api/public/posts` | GET `/api/admin/posts` |
+| 取得單篇文章 | GET `/api/public/posts/:id` | GET `/api/admin/posts/:id` |
+| 新增文章 | — | POST `/api/admin/posts` |
+| 更新文章 | — | PUT `/api/admin/posts/:id` |
+| 刪除文章 | — | DELETE `/api/admin/posts/:id` |
+
+**為什麼前台也需要讀取的 API？**
+
+前台（Angular 部落格網站）只需要「讀取」文章給訪客看，不需要 CRUD。
+後台（管理介面）才需要完整的 CRUD 來管理內容。
+
+**保護機制如何運作（`app.ts` 裡的關鍵順序）：**
+
+```typescript
+// 後台路由保護：所有 /api/admin/* 都先過這道關卡
+app.use("/api/admin", authMiddleware);  // ← 順序很重要，必須在 RegisterRoutes 之前
+
+// Tsoa 產生的路由（包含 public 和 admin）
+RegisterRoutes(app);
+```
+
+Express 的 middleware 按照掛載順序執行。
+`/api/admin/*` 的請求會先被 `authMiddleware` 攔截，沒有 token 直接回 401，
+通過後才繼續到 `RegisterRoutes` 裡實際的 Controller 方法。
+
+---
+
+## 5. 資料流程：一個請求的旅程
+
+以「後台新增一篇文章」為例，`POST /api/admin/posts`：
 
 ```
 1. 前端送出請求
-   POST http://localhost:3000/posts
+   POST http://localhost:3000/api/admin/posts
+   Headers: { Authorization: "Bearer my-token" }
    Body: { "title": "My Post", "content": "...", "author": "Alice" }
 
-2. Express 收到請求
-   app.ts 中的 RegisterRoutes(app) 把所有路由都掛上去
+2. authMiddleware 攔截
+   檢查 Authorization header 是否存在
+   → 有 token：繼續
+   → 沒有 token：立即回 401 Unauthorized，流程中斷
 
-3. 路由分配
-   routes.ts (自動產生) 看到 POST /posts → 交給 PostsController.createPost()
+3. RegisterRoutes 分配路由
+   routes.ts 看到 POST /api/admin/posts
+   → 交給 AdminPostsController.createPost()
 
 4. Controller 處理
-   postsController.ts 的 createPost() 被呼叫
-   - 驗證 request body 格式是否正確（Tsoa 自動做）
+   - Tsoa 自動驗證 request body 格式
    - 呼叫 postsService.create(body)
-   - 設定 HTTP 狀態碼 201
+   - 設定 HTTP 201
    - 回傳結果
 
 5. Service 處理
-   postsService.ts 的 create() 被呼叫
    - 產生新的 id
    - 加上 createdAt / updatedAt 時間戳
-   - 把新文章加進 posts 陣列
+   - 把新文章加進 posts 陣列（之後換成資料庫）
    - 回傳新文章
 
 6. 回應前端
@@ -146,12 +209,13 @@ angular-blog-server/
 
 ---
 
-## 5. 各檔案詳解
+## 6. 各檔案詳解
 
-### 5.1 [models/post.ts](src/models/post.ts) — 資料形狀
+### 6.1 [models/post.ts](../src/models/post.ts) — 資料形狀
 
 ```typescript
 // Post 是完整的文章物件（從資料庫/記憶體讀出來的）
+// 後台 controller 回傳這個，包含所有欄位
 export interface Post {
   id: number;
   title: string;
@@ -159,6 +223,16 @@ export interface Post {
   author: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+// 前台回傳用：不含 updatedAt（訪客不需要知道最後修改時間）
+// public controller 回傳這個，只暴露前台需要的欄位
+export interface PublicPost {
+  id: number;
+  title: string;
+  content: string;
+  author: string;
+  createdAt: Date;
 }
 
 // CreatePostDto 是「新增文章時，前端要送什麼」
@@ -179,18 +253,48 @@ export interface UpdatePostDto {
 }
 ```
 
-**為什麼要分三個 interface？**
+**為什麼要分這幾個 interface？**
 
-因為不同情境需要不同的資料：
-- 讀取 → 回傳 `Post`（包含所有欄位）
-- 新增 → 前端送 `CreatePostDto`（不含 id 和時間戳）
-- 更新 → 前端送 `UpdatePostDto`（所有欄位都是選填）
+因為不同情境需要不同的資料形狀：
 
-這樣 TypeScript 就能在你忘記送必要欄位、或送了多餘欄位時報錯。
+| interface | 用在哪 | 說明 |
+|-----------|--------|------|
+| `Post` | 後台 controller 回傳、Service 內部流通 | 完整資料，所有欄位都有 |
+| `PublicPost` | 前台 controller 回傳 | 精簡版，只有前台需要的欄位 |
+| `CreatePostDto` | 前端新增時送來 | 不含 id 和時間戳（後端自動產生） |
+| `UpdatePostDto` | 前端更新時送來 | 所有欄位都是選填 |
+
+**為什麼 id 用 UUID（`string`）而不是流水號（`number`）？**
+
+```
+流水號：GET /api/public/posts/1、/posts/2、/posts/3...
+→ 外部可以用迴圈枚舉所有資源，知道「總共有幾篇文章」
+
+UUID：GET /api/public/posts/a1b2c3d4-e5f6-7890-abcd-ef1234567890
+→ 無法猜測其他 ID，安全性較高
+```
+
+UUID 由 Node.js 內建的 `crypto.randomUUID()` 產生，不需要安裝套件：
+
+```typescript
+import { randomUUID } from "crypto";
+const id = randomUUID(); // "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+```
+
+**前台 controller 如何轉換：**
+
+```typescript
+// Service 回傳完整的 Post（含 updatedAt）
+// Controller 用解構賦值過濾掉不該給前台的欄位
+const { updatedAt, ...publicPost } = post;
+return publicPost; // 型別剛好符合 PublicPost
+```
+
+這樣的好處是：**Service 邏輯完全不用動**，只在 Controller 層控制「要給前台看哪些欄位」。
 
 ---
 
-### 5.2 [services/postsService.ts](src/services/postsService.ts) — 業務邏輯
+### 6.2 [services/postsService.ts](../src/services/postsService.ts) — 業務邏輯
 
 ```typescript
 // 模擬資料庫：目前用 array 存在記憶體裡
@@ -229,55 +333,23 @@ export class PostsService {
 
 ---
 
-### 5.3 [controllers/postsController.ts](src/controllers/postsController.ts) — API 端點
+### 6.3 [controllers/](../src/controllers/) — API 端點
 
-這是用了最多 Tsoa decorator 的地方，一行一行解釋：
+Controllers 分成兩個子資料夾，用 `@Route` 的路徑前綴來區分前後台：
 
 ```typescript
-@Route("posts")      // 這個 Controller 的基礎路徑是 /posts
-@Tags("Posts")       // 在 Swagger UI 中把這些 API 歸類在 "Posts" 分組
-export class PostsController extends Controller {
-  // extends Controller 是 Tsoa 提供的，給我們 setStatus() 等方法用
+// controllers/public/postsController.ts — 前台（只讀）
+@Route("api/public/posts")
+@Tags("Public - Posts")
+export class PublicPostsController extends Controller {
+  // 只有 GET，沒有 POST / PUT / DELETE
+}
 
-  private postsService = new PostsService(); // 建立 Service 實例
-
-  @Get("/")          // 對應 GET /posts
-  public async getPosts(): Promise<Post[]> {
-    return this.postsService.getAll();
-  }
-
-  @Get("{id}")       // 對應 GET /posts/123，{id} 是 URL 參數
-  @Response<...>(404, "Post not found")  // 告訴 Swagger 這個 API 可能回 404
-  public async getPost(
-    @Path() id: number  // 從 URL 路徑取得 id，Tsoa 會自動轉成 number
-  ): Promise<Post> {
-    const post = this.postsService.getById(id);
-    if (!post) {
-      this.setStatus(404);   // 設定 HTTP 狀態碼為 404
-      throw new Error("Post not found");
-    }
-    return post;
-  }
-
-  @Post("/")         // 對應 POST /posts
-  @SuccessResponse(201, "Created")  // 成功時回 HTTP 201
-  public async createPost(
-    @Body() body: CreatePostDto  // 從 request body 取得資料，Tsoa 自動驗證格式
-  ): Promise<Post> {
-    this.setStatus(201);
-    return this.postsService.create(body);
-  }
-
-  @Put("{id}")       // 對應 PUT /posts/123
-  public async updatePost(
-    @Path() id: number,
-    @Body() body: UpdatePostDto
-  ): Promise<Post> { ... }
-
-  @Delete("{id}")    // 對應 DELETE /posts/123
-  public async deletePost(
-    @Path() id: number
-  ): Promise<void> { ... }
+// controllers/admin/postsController.ts — 後台（完整 CRUD）
+@Route("api/admin/posts")
+@Tags("Admin - Posts")
+export class AdminPostsController extends Controller {
+  // GET + POST + PUT + DELETE 全部都有
 }
 ```
 
@@ -285,43 +357,59 @@ export class PostsController extends Controller {
 
 | Decorator | 說明 |
 |-----------|------|
-| `@Route("posts")` | 設定這個 Controller 的 URL 前綴 |
-| `@Tags("Posts")` | Swagger 分組標籤 |
+| `@Route("api/admin/posts")` | 設定這個 Controller 的完整 URL 前綴 |
+| `@Tags("Admin - Posts")` | Swagger 分組標籤（決定文件裡的分類名稱） |
 | `@Get()` / `@Post()` / `@Put()` / `@Delete()` | HTTP 方法 |
-| `@Path()` | 從 URL 路徑取得參數，e.g. `/posts/:id` |
-| `@Body()` | 從 request body 取得資料 |
+| `@Path()` | 從 URL 路徑取得參數，e.g. `{id}` → `req.params.id` |
+| `@Body()` | 從 request body 取得資料，Tsoa 自動驗證格式 |
 | `@SuccessResponse(201, ...)` | 宣告成功時的 HTTP 狀態碼 |
-| `@Response(404, ...)` | 宣告可能的錯誤狀態碼 |
+| `@Response(404, ...)` | 宣告可能的錯誤狀態碼（供 Swagger 文件顯示） |
 
 ---
 
-### 5.4 [app.ts](src/app.ts) — Express 應用程式
+### 6.4 [middleware/auth.ts](../src/middleware/auth.ts) — 後台驗證
 
 ```typescript
-export const app = express(); // 建立 Express 應用程式實例
+export function authMiddleware(req, res, next) {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+  if (!token) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;   // ← return 很重要！阻止繼續往下執行
+  }
+  // 有 token → 呼叫 next()，讓請求繼續到 Controller
+  next();
+}
+```
 
-// Middleware：處理 request body 格式
+目前只檢查 token 是否存在，之後換成真正的 JWT 驗證：
+
+```typescript
+import jwt from "jsonwebtoken";
+const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+```
+
+---
+
+### 6.5 [app.ts](../src/app.ts) — Express 應用程式
+
+```typescript
+export const app = express();
+
 app.use(express.json());           // 讓 Express 能讀懂 JSON body
 app.use(express.urlencoded(...));  // 讓 Express 能讀懂表單 body
+app.use(express.static("public")); // 讓 /swagger.json 可透過 HTTP 存取（ReDoc 需要）
 
-// 靜態檔案服務：讓 /swagger.json 可以透過 HTTP 存取
-// ReDoc 需要一個公開的 URL 來讀取 API 規格，所以要把 public/ 資料夾暴露出來
-app.use(express.static("public"));
+// API 文件
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument)); // 互動式
+app.get("/redoc", redoc({ title: "Angular Blog API", specUrl: "/swagger.json" })); // 閱讀型
 
-// 掛載 Swagger UI：互動式測試介面，瀏覽 /swagger
-app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// ⚠️ 順序重要：authMiddleware 必須在 RegisterRoutes 之前
+app.use("/api/admin", authMiddleware); // 後台路由保護
 
-// 掛載 ReDoc：美觀的閱讀型文件，瀏覽 /redoc
-app.get("/redoc", redoc({ title: "Angular Blog API", specUrl: "/swagger.json" }));
+RegisterRoutes(app); // Tsoa 產生的路由（public + admin 都在這裡）
 
-// 掛載 Tsoa 產生的所有路由（Controller 裡定義的 API 端點）
-RegisterRoutes(app);
-
-// 404 handler：所有沒有對應路由的請求，回傳 404
 app.use((_req, res) => res.status(404).json({ message: "Not Found" }));
-
-// Error handler：有任何例外拋出時，回傳 500
-app.use((err, _req, res, _next) => res.status(500).json(...));
+app.use((err, _req, res, _next) => res.status(500).json({ message: err.message }));
 ```
 
 **什麼是 Middleware？**
@@ -329,11 +417,11 @@ app.use((err, _req, res, _next) => res.status(500).json(...));
 Middleware 就是「請求到達最終處理函式之前，中途要經過的處理步驟」。
 類比：像是快遞到你手上之前，會先經過分揀中心、再到區域配送站。
 
-`app.use(express.json())` 的意思是：每個進來的 request，都先自動把 body 從 JSON 字串解析成 JavaScript 物件。
+Express 的 middleware **按照 `app.use()` 的順序執行**，這就是為什麼 `authMiddleware` 一定要放在 `RegisterRoutes` 之前。
 
 ---
 
-### 5.5 [server.ts](src/server.ts) — 啟動入口
+### 6.6 [server.ts](../src/server.ts) — 啟動入口
 
 ```typescript
 import { app } from "./app"; // 引入設定好的 Express app
@@ -353,9 +441,9 @@ app.listen(PORT, () => {
 
 ---
 
-## 6. 設定檔說明
+## 7. 設定檔說明
 
-### 6.1 [tsconfig.json](tsconfig.json)
+### 7.1 [tsconfig.json](../tsconfig.json)
 
 ```json
 {
@@ -375,7 +463,7 @@ app.listen(PORT, () => {
 
 ---
 
-### 6.2 [tsoa.json](tsoa.json)
+### 7.2 [tsoa.json](../tsoa.json)
 
 ```json
 {
@@ -395,7 +483,7 @@ app.listen(PORT, () => {
 
 ---
 
-## 7. Tsoa 是什麼？它幫了什麼？
+## 8. Tsoa 是什麼？它幫了什麼？
 
 **沒有 Tsoa 的世界（手動寫）：**
 
@@ -427,7 +515,7 @@ Tsoa 幫你做了三件事：
 
 ---
 
-## 8. API 文件工具：Swagger UI vs ReDoc
+## 9. API 文件工具：Swagger UI vs ReDoc
 
 這個專案同時提供兩個 API 文件介面，它們讀的是同一份 `public/swagger.json`，只是呈現方式不同：
 
@@ -451,7 +539,7 @@ Tsoa 幫你做了三件事：
 
 ---
 
-## 9. HTTP 狀態碼對照表
+## 10. HTTP 狀態碼對照表
 
 後端回應前端時，除了資料本身，還會附上一個狀態碼：
 
@@ -466,7 +554,7 @@ Tsoa 幫你做了三件事：
 
 ---
 
-## 10. 開發指令說明
+## 11. 開發指令說明
 
 ```bash
 # 開發模式：啟動伺服器，存檔後自動重啟
@@ -492,22 +580,20 @@ npm start
 
 ---
 
-## 11. 接下來可以做什麼
+## 12. 接下來可以做什麼
 
 按照難度排序：
 
-1. **接資料庫**
-   - 安裝 Prisma（推薦新手）或 TypeORM
-   - 把 `postsService.ts` 裡的記憶體 array 換成真正的資料庫操作
+1. **接資料庫** ← 架構已準備好
+   - 詳見 [DB_GUIDE.md](DB_GUIDE.md)
 
-2. **新增認證**
+2. **升級 Auth 為真正的 JWT 驗證** ← middleware 架構已建好
    - 安裝 `jsonwebtoken`
-   - 加入登入 / 註冊 API
-   - 在需要保護的 API 加上 middleware 驗證 JWT Token
+   - 修改 `src/middleware/auth.ts`，換成 `jwt.verify()`
+   - 新增登入 API（`POST /api/public/auth/login`），成功後回傳 JWT token
 
 3. **新增其他資源**
-   - 仿照 posts 的結構，新增 `comments` 或 `users`
-   - 在 `src/models/`、`src/services/`、`src/controllers/` 各建一個新檔案
+   - 仿照 posts / tags，詳見 [new-resource.md](new-resource.md)
 
 4. **環境設定**
    - 安裝 `dotenv`，把 PORT 等設定移到 `.env` 檔案

@@ -75,7 +75,7 @@ npx prisma migrate dev --name init
 執行後，你的資料庫裡會有這張表：
 ```sql
 CREATE TABLE "Post" (
-  "id"        SERIAL PRIMARY KEY,
+  "id"        TEXT PRIMARY KEY,   -- UUID 字串，由 Prisma @default(uuid()) 自動產生
   "title"     TEXT NOT NULL,
   "content"   TEXT NOT NULL,
   "author"    TEXT NOT NULL,
@@ -102,16 +102,19 @@ import { app } from "./app";
 
 ## Step 5 — 替換 Controller 裡的 Service
 
-打開 [src/controllers/postsController.ts](src/controllers/postsController.ts)：
+因為現在有前後台分離，需要更新的 controller 有兩個：
 
-**改第 1 行 import：**
+- [src/controllers/public/postsController.ts](../src/controllers/public/postsController.ts)
+- [src/controllers/admin/postsController.ts](../src/controllers/admin/postsController.ts)
+
+**兩個檔案都要改第 1 行 import：**
 
 ```typescript
 // 改之前（記憶體版）
-import { PostsService } from "../services/postsService";
+import { PostsService } from "../../services/postsService";
 
 // 改之後（資料庫版）
-import { PostsService } from "../services/postsService.db";
+import { PostsService } from "../../services/postsService.db";
 ```
 
 **替所有 Service 呼叫加上 `await`：**
@@ -126,41 +129,17 @@ const post = this.postsService.getById(id);
 const post = await this.postsService.getById(id);
 ```
 
-完整的 Controller 改法（共 5 處需要加 `await`）：
+完整改法（public controller 2 處、admin controller 5 處）：
 
 ```typescript
-// GET /posts
-public async getPosts(): Promise<PostModel[]> {
-  return this.postsService.getAll();  // ← 加 await
-  // return await this.postsService.getAll();
-}
+// GET（前後台都有）
+return this.postsService.getAll();          // → return await this.postsService.getAll();
+const post = this.postsService.getById(id); // → const post = await this.postsService.getById(id);
 
-// GET /posts/:id
-public async getPost(@Path() id: number): Promise<PostModel> {
-  const post = this.postsService.getById(id);  // ← 加 await
-  // const post = await this.postsService.getById(id);
-  ...
-}
-
-// POST /posts
-public async createPost(@Body() body: CreatePostDto): Promise<PostModel> {
-  return this.postsService.create(body);  // ← 加 await
-  // return await this.postsService.create(body);
-}
-
-// PUT /posts/:id
-public async updatePost(...): Promise<PostModel> {
-  const post = this.postsService.update(id, body);  // ← 加 await
-  // const post = await this.postsService.update(id, body);
-  ...
-}
-
-// DELETE /posts/:id
-public async deletePost(@Path() id: number): Promise<void> {
-  const success = this.postsService.delete(id);  // ← 加 await
-  // const success = await this.postsService.delete(id);
-  ...
-}
+// 以下只有 admin controller 有
+return this.postsService.create(body);              // → await
+const post = this.postsService.update(id, body);    // → await
+const success = this.postsService.delete(id);       // → await
 ```
 
 ---
@@ -179,15 +158,18 @@ npm run dev    # 啟動伺服器
 ```
 src/
 ├── lib/
-│   └── prisma.ts            ← Prisma Client 單例（已建好，不用動）
+│   └── prisma.ts              ← Prisma Client 單例（已建好，不用動）
 ├── services/
-│   ├── postsService.ts      ← 記憶體版（可以留著備用，或直接刪掉）
-│   └── postsService.db.ts   ← 現在用這個
+│   ├── postsService.ts        ← 記憶體版（可留著備用，或直接刪掉）
+│   └── postsService.db.ts     ← 現在用這個
 ├── controllers/
-│   └── postsController.ts   ← import 已改成 .db 版
+│   ├── public/
+│   │   └── postsController.ts ← import 已改成 .db 版
+│   └── admin/
+│       └── postsController.ts ← import 已改成 .db 版
 prisma/
-├── schema.prisma            ← 資料庫 schema（已建好）
-└── migrations/              ← Prisma 自動產生的 SQL 歷史紀錄
+├── schema.prisma              ← 資料庫 schema（已建好）
+└── migrations/                ← Prisma 自動產生的 SQL 歷史紀錄
 ```
 
 ---

@@ -14,7 +14,7 @@ export class PostsService {
     });
   }
 
-  async getById(id: number): Promise<Post | undefined> {
+  async getById(id: string): Promise<Post | undefined> {
     const post = await prisma.post.findUnique({
       where: { id },
     });
@@ -27,7 +27,7 @@ export class PostsService {
     });
   }
 
-  async update(id: number, dto: UpdatePostDto): Promise<Post | undefined> {
+  async update(id: string, dto: UpdatePostDto): Promise<Post | undefined> {
     try {
       return await prisma.post.update({
         where: { id },
@@ -39,7 +39,7 @@ export class PostsService {
     }
   }
 
-  async delete(id: number): Promise<boolean> {
+  async delete(id: string): Promise<boolean> {
     try {
       await prisma.post.delete({
         where: { id },

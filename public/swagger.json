@@ -7,18 +7,85 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"Tag": {
+			"PublicTag": {
+				"description": "前台公開標籤物件（不含後台管理欄位）",
 				"properties": {
 					"id": {
-						"type": "number",
-						"format": "double"
+						"type": "string",
+						"description": "標籤唯一識別碼（UUID）",
+						"example": "b2c3d4e5-f6a7-8901-bcde-f12345678901"
 					},
 					"name": {
-						"type": "string"
+						"type": "string",
+						"description": "標籤名稱",
+						"example": "TypeScript"
+					}
+				},
+				"required": [
+					"id",
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PublicPost": {
+				"description": "前台公開文章物件（不含後台管理欄位）",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "文章唯一識別碼（UUID）",
+						"example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+					},
+					"title": {
+						"type": "string",
+						"description": "文章標題",
+						"example": "我的第一篇文章"
+					},
+					"content": {
+						"type": "string",
+						"description": "文章內文",
+						"example": "這是文章內容..."
+					},
+					"author": {
+						"type": "string",
+						"description": "作者名稱",
+						"example": "Alice"
 					},
 					"createdAt": {
 						"type": "string",
-						"format": "date-time"
+						"format": "date-time",
+						"description": "建立時間（UTC）",
+						"example": "2024-01-15T08:30:00.000Z"
+					}
+				},
+				"required": [
+					"id",
+					"title",
+					"content",
+					"author",
+					"createdAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Tag": {
+				"description": "後台完整標籤物件",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "標籤唯一識別碼（UUID，由後端自動產生）",
+						"example": "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+					},
+					"name": {
+						"type": "string",
+						"description": "標籤名稱",
+						"example": "TypeScript"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "建立時間（UTC）",
+						"example": "2024-01-15T08:30:00.000Z"
 					}
 				},
 				"required": [
@@ -30,9 +97,12 @@
 				"additionalProperties": false
 			},
 			"CreateTagDto": {
+				"description": "新增標籤時的請求資料",
 				"properties": {
 					"name": {
-						"type": "string"
+						"type": "string",
+						"description": "標籤名稱（必填）",
+						"example": "TypeScript"
 					}
 				},
 				"required": [
@@ -42,9 +112,12 @@
 				"additionalProperties": false
 			},
 			"UpdateTagDto": {
+				"description": "更新標籤時的請求資料",
 				"properties": {
 					"name": {
-						"type": "string"
+						"type": "string",
+						"description": "新的標籤名稱",
+						"example": "JavaScript"
 					}
 				},
 				"required": [
@@ -54,27 +127,39 @@
 				"additionalProperties": false
 			},
 			"PostModel": {
+				"description": "後台完整文章物件（從資料庫/記憶體讀出來的完整資料）",
 				"properties": {
 					"id": {
-						"type": "number",
-						"format": "double"
+						"type": "string",
+						"description": "文章唯一識別碼（UUID，由後端自動產生）",
+						"example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 					},
 					"title": {
-						"type": "string"
+						"type": "string",
+						"description": "文章標題",
+						"example": "我的第一篇文章"
 					},
 					"content": {
-						"type": "string"
+						"type": "string",
+						"description": "文章內文（支援純文字或 Markdown）",
+						"example": "這是文章內容..."
 					},
 					"author": {
-						"type": "string"
+						"type": "string",
+						"description": "作者名稱",
+						"example": "Alice"
 					},
 					"createdAt": {
 						"type": "string",
-						"format": "date-time"
+						"format": "date-time",
+						"description": "建立時間（UTC）",
+						"example": "2024-01-15T08:30:00.000Z"
 					},
 					"updatedAt": {
 						"type": "string",
-						"format": "date-time"
+						"format": "date-time",
+						"description": "最後更新時間（UTC），未更新過則為 null",
+						"example": "2024-01-20T12:00:00.000Z"
 					}
 				},
 				"required": [
@@ -89,15 +174,22 @@
 				"additionalProperties": false
 			},
 			"CreatePostDto": {
+				"description": "新增文章時的請求資料（id 和時間戳由後端自動產生）",
 				"properties": {
 					"title": {
-						"type": "string"
+						"type": "string",
+						"description": "文章標題（必填）",
+						"example": "我的第一篇文章"
 					},
 					"content": {
-						"type": "string"
+						"type": "string",
+						"description": "文章內文（必填）",
+						"example": "這是文章內容..."
 					},
 					"author": {
-						"type": "string"
+						"type": "string",
+						"description": "作者名稱（必填）",
+						"example": "Alice"
 					}
 				},
 				"required": [
@@ -109,15 +201,22 @@
 				"additionalProperties": false
 			},
 			"UpdatePostDto": {
+				"description": "更新文章時的請求資料（所有欄位皆為選填，只傳要改的欄位即可）",
 				"properties": {
 					"title": {
-						"type": "string"
+						"type": "string",
+						"description": "新的文章標題",
+						"example": "更新後的標題"
 					},
 					"content": {
-						"type": "string"
+						"type": "string",
+						"description": "新的文章內文",
+						"example": "更新後的內容..."
 					},
 					"author": {
-						"type": "string"
+						"type": "string",
+						"description": "新的作者名稱",
+						"example": "Bob"
 					}
 				},
 				"type": "object",
@@ -135,7 +234,161 @@
 		"contact": {}
 	},
 	"paths": {
-		"/tags": {
+		"/api/public/tags": {
+			"get": {
+				"operationId": "GetTags",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/PublicTag"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"description": "取得所有標籤清單",
+				"tags": [
+					"Public - Tags"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/api/public/tags/{id}": {
+			"get": {
+				"operationId": "GetTag",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PublicTag"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Tag not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "根據 ID 取得單一標籤",
+				"tags": [
+					"Public - Tags"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "標籤 ID",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/api/public/posts": {
+			"get": {
+				"operationId": "GetPosts",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/PublicPost"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"description": "取得所有文章清單",
+				"tags": [
+					"Public - Posts"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/api/public/posts/{id}": {
+			"get": {
+				"operationId": "GetPost",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PublicPost"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Post not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "根據 ID 取得單篇文章",
+				"tags": [
+					"Public - Posts"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "文章 ID",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/api/admin/tags": {
 			"get": {
 				"operationId": "GetTags",
 				"responses": {
@@ -153,8 +406,9 @@
 						}
 					}
 				},
+				"description": "取得所有標籤清單（含後台管理欄位）",
 				"tags": [
-					"Tags"
+					"Admin - Tags"
 				],
 				"security": [],
 				"parameters": []
@@ -173,8 +427,9 @@
 						}
 					}
 				},
+				"description": "新增一個標籤",
 				"tags": [
-					"Tags"
+					"Admin - Tags"
 				],
 				"security": [],
 				"parameters": [],
@@ -190,7 +445,7 @@
 				}
 			}
 		},
-		"/tags/{id}": {
+		"/api/admin/tags/{id}": {
 			"get": {
 				"operationId": "GetTag",
 				"responses": {
@@ -223,18 +478,19 @@
 						}
 					}
 				},
+				"description": "根據 ID 取得單一標籤（含後台管理欄位）",
 				"tags": [
-					"Tags"
+					"Admin - Tags"
 				],
 				"security": [],
 				"parameters": [
 					{
+						"description": "標籤 ID",
 						"in": "path",
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]
@@ -271,18 +527,19 @@
 						}
 					}
 				},
+				"description": "更新指定標籤名稱",
 				"tags": [
-					"Tags"
+					"Admin - Tags"
 				],
 				"security": [],
 				"parameters": [
 					{
+						"description": "標籤 ID",
 						"in": "path",
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				],
@@ -322,24 +579,25 @@
 						}
 					}
 				},
+				"description": "刪除指定標籤",
 				"tags": [
-					"Tags"
+					"Admin - Tags"
 				],
 				"security": [],
 				"parameters": [
 					{
+						"description": "標籤 ID",
 						"in": "path",
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]
 			}
 		},
-		"/posts": {
+		"/api/admin/posts": {
 			"get": {
 				"operationId": "GetPosts",
 				"responses": {
@@ -357,9 +615,9 @@
 						}
 					}
 				},
-				"description": "取得所有文章",
+				"description": "取得所有文章清單（含後台管理欄位）",
 				"tags": [
-					"Posts"
+					"Admin - Posts"
 				],
 				"security": [],
 				"parameters": []
@@ -378,9 +636,9 @@
 						}
 					}
 				},
-				"description": "建立新文章",
+				"description": "新增一篇文章",
 				"tags": [
-					"Posts"
+					"Admin - Posts"
 				],
 				"security": [],
 				"parameters": [],
@@ -396,7 +654,7 @@
 				}
 			}
 		},
-		"/posts/{id}": {
+		"/api/admin/posts/{id}": {
 			"get": {
 				"operationId": "GetPost",
 				"responses": {
@@ -429,19 +687,19 @@
 						}
 					}
 				},
-				"description": "根據 ID 取得單篇文章",
+				"description": "根據 ID 取得單篇文章（含後台管理欄位）",
 				"tags": [
-					"Posts"
+					"Admin - Posts"
 				],
 				"security": [],
 				"parameters": [
 					{
+						"description": "文章 ID",
 						"in": "path",
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]
@@ -478,19 +736,19 @@
 						}
 					}
 				},
-				"description": "更新文章",
+				"description": "更新指定文章的內容（只傳要修改的欄位即可）",
 				"tags": [
-					"Posts"
+					"Admin - Posts"
 				],
 				"security": [],
 				"parameters": [
 					{
+						"description": "文章 ID",
 						"in": "path",
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				],
@@ -530,19 +788,19 @@
 						}
 					}
 				},
-				"description": "刪除文章",
+				"description": "刪除指定文章",
 				"tags": [
-					"Posts"
+					"Admin - Posts"
 				],
 				"security": [],
 				"parameters": [
 					{
+						"description": "文章 ID",
 						"in": "path",
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]

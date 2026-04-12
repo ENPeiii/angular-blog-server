@@ -11,22 +11,29 @@ import {
   Tags,
   Response,
 } from "tsoa";
-import { CreateTagDto, Tag, UpdateTagDto } from "../models/tag";
-import { TagsService } from "../services/tagsService";
+import { CreateTagDto, Tag, UpdateTagDto } from "../../models/tag";
+import { TagsService } from "../../services/tagsService";
 
-@Route("tags")
-@Tags("Tags")
-export class TagsController extends Controller {
+@Route("api/admin/tags")
+@Tags("Admin - Tags")
+export class AdminTagsController extends Controller {
   private tagsService = new TagsService();
 
+  /**
+   * 取得所有標籤清單（含後台管理欄位）
+   */
   @Get("/")
   public async getTags(): Promise<Tag[]> {
     return this.tagsService.getAll();
   }
 
+  /**
+   * 根據 ID 取得單一標籤（含後台管理欄位）
+   * @param id 標籤 ID
+   */
   @Get("{id}")
   @Response<{ message: string }>(404, "Tag not found")
-  public async getTag(@Path() id: number): Promise<Tag> {
+  public async getTag(@Path() id: string): Promise<Tag> {
     const tag = this.tagsService.getById(id);
     if (!tag) {
       this.setStatus(404);
@@ -35,6 +42,9 @@ export class TagsController extends Controller {
     return tag;
   }
 
+  /**
+   * 新增一個標籤
+   */
   @Post("/")
   @SuccessResponse(201, "Created")
   public async createTag(@Body() body: CreateTagDto): Promise<Tag> {
@@ -42,10 +52,14 @@ export class TagsController extends Controller {
     return this.tagsService.create(body);
   }
 
+  /**
+   * 更新指定標籤名稱
+   * @param id 標籤 ID
+   */
   @Put("{id}")
   @Response<{ message: string }>(404, "Tag not found")
   public async updateTag(
-    @Path() id: number,
+    @Path() id: string,
     @Body() body: UpdateTagDto
   ): Promise<Tag> {
     const tag = this.tagsService.update(id, body);
@@ -56,10 +70,14 @@ export class TagsController extends Controller {
     return tag;
   }
 
+  /**
+   * 刪除指定標籤
+   * @param id 標籤 ID
+   */
   @Delete("{id}")
   @SuccessResponse(204, "Deleted")
   @Response<{ message: string }>(404, "Tag not found")
-  public async deleteTag(@Path() id: number): Promise<void> {
+  public async deleteTag(@Path() id: string): Promise<void> {
     const success = this.tagsService.delete(id);
     if (!success) {
       this.setStatus(404);

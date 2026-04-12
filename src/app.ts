@@ -2,6 +2,7 @@ import express, { Application, Request, Response, NextFunction } from "express";
 import swaggerUi from "swagger-ui-express";
 import redoc from "redoc-express";
 import { RegisterRoutes } from "./routes";
+import { authMiddleware } from "./middleware/auth";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -34,6 +35,9 @@ app.get(
     },
   })
 );
+
+// 後台路由保護：所有 /api/admin/* 都需要通過 auth 驗證
+app.use("/api/admin", authMiddleware);
 
 // Tsoa generated routes
 RegisterRoutes(app);
