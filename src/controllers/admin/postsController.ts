@@ -13,6 +13,7 @@ import {
 } from "tsoa";
 import { CreatePostDto, Post as PostModel, UpdatePostDto } from "../../models/post";
 import { PostsService } from "../../services/postsService";
+import { ApiResponse } from "../../models/response";
 
 @Route("api/admin/posts")
 @Tags("Admin - Posts")
@@ -23,8 +24,8 @@ export class AdminPostsController extends Controller {
    * 取得所有文章清單（含後台管理欄位）
    */
   @Get("/")
-  public async getPosts(): Promise<PostModel[]> {
-    return this.postsService.getAll();
+  public async getPosts(): Promise<ApiResponse<PostModel[]>> {
+    return { data: this.postsService.getAll() };
   }
 
   /**
@@ -33,13 +34,13 @@ export class AdminPostsController extends Controller {
    */
   @Get("{id}")
   @Response<{ message: string }>(404, "Post not found")
-  public async getPost(@Path() id: string): Promise<PostModel> {
+  public async getPost(@Path() id: string): Promise<ApiResponse<PostModel>> {
     const post = this.postsService.getById(id);
     if (!post) {
       this.setStatus(404);
       throw new Error("Post not found");
     }
-    return post;
+    return { data: post };
   }
 
   /**
@@ -47,9 +48,9 @@ export class AdminPostsController extends Controller {
    */
   @Post("/")
   @SuccessResponse(201, "Created")
-  public async createPost(@Body() body: CreatePostDto): Promise<PostModel> {
+  public async createPost(@Body() body: CreatePostDto): Promise<ApiResponse<PostModel>> {
     this.setStatus(201);
-    return this.postsService.create(body);
+    return { data: this.postsService.create(body) };
   }
 
   /**
@@ -61,13 +62,13 @@ export class AdminPostsController extends Controller {
   public async updatePost(
     @Path() id: string,
     @Body() body: UpdatePostDto
-  ): Promise<PostModel> {
+  ): Promise<ApiResponse<PostModel>> {
     const post = this.postsService.update(id, body);
     if (!post) {
       this.setStatus(404);
       throw new Error("Post not found");
     }
-    return post;
+    return { data: post };
   }
 
   /**

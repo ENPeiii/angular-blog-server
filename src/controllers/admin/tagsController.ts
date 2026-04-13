@@ -13,6 +13,7 @@ import {
 } from "tsoa";
 import { CreateTagDto, Tag, UpdateTagDto } from "../../models/tag";
 import { TagsService } from "../../services/tagsService";
+import { ApiResponse } from "../../models/response";
 
 @Route("api/admin/tags")
 @Tags("Admin - Tags")
@@ -23,8 +24,8 @@ export class AdminTagsController extends Controller {
    * 取得所有標籤清單（含後台管理欄位）
    */
   @Get("/")
-  public async getTags(): Promise<Tag[]> {
-    return this.tagsService.getAll();
+  public async getTags(): Promise<ApiResponse<Tag[]>> {
+    return { data: this.tagsService.getAll() };
   }
 
   /**
@@ -33,13 +34,13 @@ export class AdminTagsController extends Controller {
    */
   @Get("{id}")
   @Response<{ message: string }>(404, "Tag not found")
-  public async getTag(@Path() id: string): Promise<Tag> {
+  public async getTag(@Path() id: string): Promise<ApiResponse<Tag>> {
     const tag = this.tagsService.getById(id);
     if (!tag) {
       this.setStatus(404);
       throw new Error("Tag not found");
     }
-    return tag;
+    return { data: tag };
   }
 
   /**
@@ -47,9 +48,9 @@ export class AdminTagsController extends Controller {
    */
   @Post("/")
   @SuccessResponse(201, "Created")
-  public async createTag(@Body() body: CreateTagDto): Promise<Tag> {
+  public async createTag(@Body() body: CreateTagDto): Promise<ApiResponse<Tag>> {
     this.setStatus(201);
-    return this.tagsService.create(body);
+    return { data: this.tagsService.create(body) };
   }
 
   /**
@@ -61,13 +62,13 @@ export class AdminTagsController extends Controller {
   public async updateTag(
     @Path() id: string,
     @Body() body: UpdateTagDto
-  ): Promise<Tag> {
+  ): Promise<ApiResponse<Tag>> {
     const tag = this.tagsService.update(id, body);
     if (!tag) {
       this.setStatus(404);
       throw new Error("Tag not found");
     }
-    return tag;
+    return { data: tag };
   }
 
   /**

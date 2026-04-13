@@ -1,4 +1,5 @@
 import express, { Application, Request, Response, NextFunction } from "express";
+import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import redoc from "redoc-express";
 import { RegisterRoutes } from "./routes";
@@ -8,6 +9,7 @@ import * as path from "path";
 
 export const app: Application = express();
 
+app.use(cors({ origin: "http://localhost:4200" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

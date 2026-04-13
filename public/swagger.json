@@ -28,6 +28,35 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ApiResponse_PublicTag-Array_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/PublicTag"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_PublicTag_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/PublicTag"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"PublicPost": {
 				"description": "前台公開文章物件（不含後台管理欄位）",
 				"properties": {
@@ -64,6 +93,35 @@
 					"content",
 					"author",
 					"createdAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_PublicPost-Array_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/PublicPost"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_PublicPost_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/PublicPost"
+					}
+				},
+				"required": [
+					"data"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -122,6 +180,16 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ApiResponse_Banner-or-undefined_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/Banner"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Tag": {
 				"description": "後台完整標籤物件",
 				"properties": {
@@ -146,6 +214,35 @@
 					"id",
 					"name",
 					"createdAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_Tag-Array_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/Tag"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_Tag_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/Tag"
+					}
+				},
+				"required": [
+					"data"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -223,6 +320,35 @@
 					"author",
 					"createdAt",
 					"updatedAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_PostModel-Array_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/PostModel"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_PostModel_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/PostModel"
+					}
+				},
+				"required": [
+					"data"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -330,6 +456,35 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ApiResponse_BannerModel-Array_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/BannerModel"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_BannerModel_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/BannerModel"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"CreateBannerDto": {
 				"properties": {
 					"title": {
@@ -404,10 +559,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/PublicTag"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/ApiResponse_PublicTag-Array_"
 								}
 							}
 						}
@@ -430,7 +582,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/PublicTag"
+									"$ref": "#/components/schemas/ApiResponse_PublicTag_"
 								}
 							}
 						}
@@ -481,10 +633,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/PublicPost"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/ApiResponse_PublicPost-Array_"
 								}
 							}
 						}
@@ -507,7 +656,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/PublicPost"
+									"$ref": "#/components/schemas/ApiResponse_PublicPost_"
 								}
 							}
 						}
@@ -558,7 +707,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Banner"
+									"$ref": "#/components/schemas/ApiResponse_Banner-or-undefined_"
 								}
 							}
 						}
@@ -581,10 +730,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/Tag"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/ApiResponse_Tag-Array_"
 								}
 							}
 						}
@@ -605,7 +751,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Tag"
+									"$ref": "#/components/schemas/ApiResponse_Tag_"
 								}
 							}
 						}
@@ -638,7 +784,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Tag"
+									"$ref": "#/components/schemas/ApiResponse_Tag_"
 								}
 							}
 						}
@@ -687,7 +833,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Tag"
+									"$ref": "#/components/schemas/ApiResponse_Tag_"
 								}
 							}
 						}
@@ -790,10 +936,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/PostModel"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/ApiResponse_PostModel-Array_"
 								}
 							}
 						}
@@ -814,7 +957,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/PostModel"
+									"$ref": "#/components/schemas/ApiResponse_PostModel_"
 								}
 							}
 						}
@@ -847,7 +990,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/PostModel"
+									"$ref": "#/components/schemas/ApiResponse_PostModel_"
 								}
 							}
 						}
@@ -896,7 +1039,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/PostModel"
+									"$ref": "#/components/schemas/ApiResponse_PostModel_"
 								}
 							}
 						}
@@ -999,10 +1142,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/BannerModel"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/ApiResponse_BannerModel-Array_"
 								}
 							}
 						}
@@ -1023,7 +1163,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/BannerModel"
+									"$ref": "#/components/schemas/ApiResponse_BannerModel_"
 								}
 							}
 						}
@@ -1056,7 +1196,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/BannerModel"
+									"$ref": "#/components/schemas/ApiResponse_BannerModel_"
 								}
 							}
 						}
@@ -1105,7 +1245,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/BannerModel"
+									"$ref": "#/components/schemas/ApiResponse_BannerModel_"
 								}
 							}
 						}
