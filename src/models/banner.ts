@@ -1,10 +1,13 @@
+
+type BannerType = 'img' | 'imgText';
+
 export interface Banner {
   /** 唯一識別碼（UUID，由後端自動產生） @example "a1b2c3d4-e5f6-7890-abcd-ef1234567890" */
   id: string;
   /** banner 名稱 @example "logo+文字" */
   title: string;
-  /** banner 類型 @example "圖文|圖" */
-  type: string;
+  /** banner 類型 @example "imgText" */
+  type: BannerType;
   /** 圖片網址 */
   img: string;
   /** 是否啟用 */
@@ -23,8 +26,8 @@ export interface PublicBanner{
   id: string;
   /** banner 名稱 @example "logo+文字" */
   title: string;
-  /** banner 類型 @example "圖文|圖" */
-  type: string;
+  /** banner 類型 @example "imgText" */
+  type: BannerType;
   /** 圖片網址 */
   img: string;
   /** 內容 */
@@ -34,8 +37,8 @@ export interface PublicBanner{
 export interface CreateBannerDto {
   /** banner 名稱 @example "logo+文字" */
   title: string;
-  /** banner 類型 @example "圖文|圖" */
-  type: string;
+  /** banner 類型 @example "imgText" */
+  type: BannerType;
   /** 圖片網址 */
   img: string;
   /** 內容 */
@@ -45,10 +48,10 @@ export interface CreateBannerDto {
 export interface UpdateBannerDto {
   /** banner 名稱 @example "logo+文字" */
   title?: string;
-  /** banner 類型 @example "圖文|圖" */
-  type?: string;
   /** 圖片網址 */
   img?: string;
   /** 內容 */
   content?: string;
+  /** 是否啟用 */
+  isActive?: boolean;
 }

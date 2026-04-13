@@ -126,6 +126,13 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"BannerType": {
+				"type": "string",
+				"enum": [
+					"img",
+					"imgText"
+				]
+			},
 			"Banner": {
 				"properties": {
 					"id": {
@@ -139,9 +146,9 @@
 						"example": "logo+文字"
 					},
 					"type": {
-						"type": "string",
+						"$ref": "#/components/schemas/BannerType",
 						"description": "banner 類型",
-						"example": "圖文|圖"
+						"example": "imgText"
 					},
 					"img": {
 						"type": "string",
@@ -415,9 +422,9 @@
 						"example": "logo+文字"
 					},
 					"type": {
-						"type": "string",
+						"$ref": "#/components/schemas/BannerType",
 						"description": "banner 類型",
-						"example": "圖文|圖"
+						"example": "imgText"
 					},
 					"img": {
 						"type": "string",
@@ -493,9 +500,9 @@
 						"example": "logo+文字"
 					},
 					"type": {
-						"type": "string",
+						"$ref": "#/components/schemas/BannerType",
 						"description": "banner 類型",
-						"example": "圖文|圖"
+						"example": "imgText"
 					},
 					"img": {
 						"type": "string",
@@ -521,11 +528,6 @@
 						"description": "banner 名稱",
 						"example": "logo+文字"
 					},
-					"type": {
-						"type": "string",
-						"description": "banner 類型",
-						"example": "圖文|圖"
-					},
 					"img": {
 						"type": "string",
 						"description": "圖片網址"
@@ -533,6 +535,10 @@
 					"content": {
 						"type": "string",
 						"description": "內容"
+					},
+					"isActive": {
+						"type": "boolean",
+						"description": "是否啟用"
 					}
 				},
 				"type": "object",

@@ -4,7 +4,7 @@ import { Banner, CreateBannerDto, UpdateBannerDto } from './../models/banner';
 const banners: Banner []= [{
   id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   title: "logo+文字",
-  type: "圖文",
+  type: "imgText",
   img: "https://avatars.githubusercontent.com/u/110892385?v=4",
   isActive: true,
   content: "# <span style=\"color: #F5992A\">Be my own goddess</span>\n\n程式是種樂趣，是訴說想像的語言無須畏懼",
@@ -44,9 +44,19 @@ export class BannerService {
     if (!banner) return undefined;
 
     if (dto.title !== undefined) banner.title = dto.title;
-    if (dto.type !== undefined) banner.type = dto.type;
     if (dto.img !== undefined) banner.img = dto.img;
     if (dto.content !== undefined) banner.content = dto.content;
+    if (dto.isActive !== undefined) {
+      if (dto.isActive) {
+        // 啟用這個 banner 的同時，停用其他 banner
+        banners.forEach((b) => {
+          if (b.id !== id) b.isActive = false;
+        });
+      }
+      banner.isActive = dto.isActive;
+    } 
+
+
     banner.updatedAt = new Date();
 
     return banner;

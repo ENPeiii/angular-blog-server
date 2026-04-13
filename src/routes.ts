@@ -75,12 +75,17 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "BannerType": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["img"]},{"dataType":"enum","enums":["imgText"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Banner": {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"string","required":true},
             "title": {"dataType":"string","required":true},
-            "type": {"dataType":"string","required":true},
+            "type": {"ref":"BannerType","required":true},
             "img": {"dataType":"string","required":true},
             "isActive": {"dataType":"boolean","required":true},
             "content": {"dataType":"string"},
@@ -194,7 +199,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "id": {"dataType":"string","required":true},
             "title": {"dataType":"string","required":true},
-            "type": {"dataType":"string","required":true},
+            "type": {"ref":"BannerType","required":true},
             "img": {"dataType":"string","required":true},
             "isActive": {"dataType":"boolean","required":true},
             "content": {"dataType":"string"},
@@ -224,7 +229,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "title": {"dataType":"string","required":true},
-            "type": {"dataType":"string","required":true},
+            "type": {"ref":"BannerType","required":true},
             "img": {"dataType":"string","required":true},
             "content": {"dataType":"string"},
         },
@@ -235,9 +240,9 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "title": {"dataType":"string"},
-            "type": {"dataType":"string"},
             "img": {"dataType":"string"},
             "content": {"dataType":"string"},
+            "isActive": {"dataType":"boolean"},
         },
         "additionalProperties": false,
     },
