@@ -8,9 +8,13 @@ import { PublicTagsController } from './controllers/public/tagsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { PublicPostsController } from './controllers/public/postsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { PublicBannerController } from './controllers/public/bannerController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { AdminTagsController } from './controllers/admin/tagsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { AdminPostsController } from './controllers/admin/postsController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { AdminBannerController } from './controllers/admin/bannerController';
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
 
 
@@ -35,6 +39,21 @@ const models: TsoaRoute.Models = {
             "content": {"dataType":"string","required":true},
             "author": {"dataType":"string","required":true},
             "createdAt": {"dataType":"datetime","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Banner": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string","required":true},
+            "title": {"dataType":"string","required":true},
+            "type": {"dataType":"string","required":true},
+            "img": {"dataType":"string","required":true},
+            "isActive": {"dataType":"boolean","required":true},
+            "content": {"dataType":"string"},
+            "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
         },
         "additionalProperties": false,
     },
@@ -94,6 +113,43 @@ const models: TsoaRoute.Models = {
             "title": {"dataType":"string"},
             "content": {"dataType":"string"},
             "author": {"dataType":"string"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "BannerModel": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string","required":true},
+            "title": {"dataType":"string","required":true},
+            "type": {"dataType":"string","required":true},
+            "img": {"dataType":"string","required":true},
+            "isActive": {"dataType":"boolean","required":true},
+            "content": {"dataType":"string"},
+            "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CreateBannerDto": {
+        "dataType": "refObject",
+        "properties": {
+            "title": {"dataType":"string","required":true},
+            "type": {"dataType":"string","required":true},
+            "img": {"dataType":"string","required":true},
+            "content": {"dataType":"string"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UpdateBannerDto": {
+        "dataType": "refObject",
+        "properties": {
+            "title": {"dataType":"string"},
+            "type": {"dataType":"string"},
+            "img": {"dataType":"string"},
+            "content": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
@@ -222,6 +278,35 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'getPost',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsPublicBannerController_getPublicBanner: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/api/public/banner',
+            ...(fetchMiddlewares<RequestHandler>(PublicBannerController)),
+            ...(fetchMiddlewares<RequestHandler>(PublicBannerController.prototype.getPublicBanner)),
+
+            async function PublicBannerController_getPublicBanner(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPublicBannerController_getPublicBanner, request, response });
+
+                const controller = new PublicBannerController();
+
+              await templateService.apiHandler({
+                methodName: 'getPublicBanner',
                 controller,
                 response,
                 next,
@@ -522,6 +607,156 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'deletePost',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 204,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminBannerController_getBanners: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/api/admin/banner',
+            ...(fetchMiddlewares<RequestHandler>(AdminBannerController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminBannerController.prototype.getBanners)),
+
+            async function AdminBannerController_getBanners(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminBannerController_getBanners, request, response });
+
+                const controller = new AdminBannerController();
+
+              await templateService.apiHandler({
+                methodName: 'getBanners',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminBannerController_getBanner: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
+        };
+        app.get('/api/admin/banner/:id',
+            ...(fetchMiddlewares<RequestHandler>(AdminBannerController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminBannerController.prototype.getBanner)),
+
+            async function AdminBannerController_getBanner(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminBannerController_getBanner, request, response });
+
+                const controller = new AdminBannerController();
+
+              await templateService.apiHandler({
+                methodName: 'getBanner',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminBannerController_createBanner: Record<string, TsoaRoute.ParameterSchema> = {
+                body: {"in":"body","name":"body","required":true,"ref":"CreateBannerDto"},
+        };
+        app.post('/api/admin/banner',
+            ...(fetchMiddlewares<RequestHandler>(AdminBannerController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminBannerController.prototype.createBanner)),
+
+            async function AdminBannerController_createBanner(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminBannerController_createBanner, request, response });
+
+                const controller = new AdminBannerController();
+
+              await templateService.apiHandler({
+                methodName: 'createBanner',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminBannerController_updateBanner: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
+                body: {"in":"body","name":"body","required":true,"ref":"UpdateBannerDto"},
+        };
+        app.put('/api/admin/banner/:id',
+            ...(fetchMiddlewares<RequestHandler>(AdminBannerController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminBannerController.prototype.updateBanner)),
+
+            async function AdminBannerController_updateBanner(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminBannerController_updateBanner, request, response });
+
+                const controller = new AdminBannerController();
+
+              await templateService.apiHandler({
+                methodName: 'updateBanner',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminBannerController_deleteBanner: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
+        };
+        app.delete('/api/admin/banner/:id',
+            ...(fetchMiddlewares<RequestHandler>(AdminBannerController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminBannerController.prototype.deleteBanner)),
+
+            async function AdminBannerController_deleteBanner(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminBannerController_deleteBanner, request, response });
+
+                const controller = new AdminBannerController();
+
+              await templateService.apiHandler({
+                methodName: 'deleteBanner',
                 controller,
                 response,
                 next,

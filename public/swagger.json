@@ -68,6 +68,60 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Banner": {
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "唯一識別碼（UUID，由後端自動產生）",
+						"example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+					},
+					"title": {
+						"type": "string",
+						"description": "banner 名稱",
+						"example": "logo+文字"
+					},
+					"type": {
+						"type": "string",
+						"description": "banner 類型",
+						"example": "圖文|圖"
+					},
+					"img": {
+						"type": "string",
+						"description": "圖片網址"
+					},
+					"isActive": {
+						"type": "boolean",
+						"description": "是否啟用"
+					},
+					"content": {
+						"type": "string",
+						"description": "內容"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "建立時間（UTC）",
+						"example": "2024-01-15T08:30:00.000Z"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "最後更新時間（UTC），未更新過則為 null",
+						"example": "2024-01-20T12:00:00.000Z"
+					}
+				},
+				"required": [
+					"id",
+					"title",
+					"type",
+					"img",
+					"isActive",
+					"createdAt",
+					"updatedAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Tag": {
 				"description": "後台完整標籤物件",
 				"properties": {
@@ -217,6 +271,113 @@
 						"type": "string",
 						"description": "新的作者名稱",
 						"example": "Bob"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BannerModel": {
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "唯一識別碼（UUID，由後端自動產生）",
+						"example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+					},
+					"title": {
+						"type": "string",
+						"description": "banner 名稱",
+						"example": "logo+文字"
+					},
+					"type": {
+						"type": "string",
+						"description": "banner 類型",
+						"example": "圖文|圖"
+					},
+					"img": {
+						"type": "string",
+						"description": "圖片網址"
+					},
+					"isActive": {
+						"type": "boolean",
+						"description": "是否啟用"
+					},
+					"content": {
+						"type": "string",
+						"description": "內容"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "建立時間（UTC）",
+						"example": "2024-01-15T08:30:00.000Z"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "最後更新時間（UTC），未更新過則為 null",
+						"example": "2024-01-20T12:00:00.000Z"
+					}
+				},
+				"required": [
+					"id",
+					"title",
+					"type",
+					"img",
+					"isActive",
+					"createdAt",
+					"updatedAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateBannerDto": {
+				"properties": {
+					"title": {
+						"type": "string",
+						"description": "banner 名稱",
+						"example": "logo+文字"
+					},
+					"type": {
+						"type": "string",
+						"description": "banner 類型",
+						"example": "圖文|圖"
+					},
+					"img": {
+						"type": "string",
+						"description": "圖片網址"
+					},
+					"content": {
+						"type": "string",
+						"description": "內容"
+					}
+				},
+				"required": [
+					"title",
+					"type",
+					"img"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateBannerDto": {
+				"properties": {
+					"title": {
+						"type": "string",
+						"description": "banner 名稱",
+						"example": "logo+文字"
+					},
+					"type": {
+						"type": "string",
+						"description": "banner 類型",
+						"example": "圖文|圖"
+					},
+					"img": {
+						"type": "string",
+						"description": "圖片網址"
+					},
+					"content": {
+						"type": "string",
+						"description": "內容"
 					}
 				},
 				"type": "object",
@@ -386,6 +547,29 @@
 						}
 					}
 				]
+			}
+		},
+		"/api/public/banner": {
+			"get": {
+				"operationId": "GetPublicBanner",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Banner"
+								}
+							}
+						}
+					}
+				},
+				"description": "取得前台 banner",
+				"tags": [
+					"Public - Banner"
+				],
+				"security": [],
+				"parameters": []
 			}
 		},
 		"/api/admin/tags": {
@@ -796,6 +980,215 @@
 				"parameters": [
 					{
 						"description": "文章 ID",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/api/admin/banner": {
+			"get": {
+				"operationId": "GetBanners",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/BannerModel"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"description": "取得所有後台 banner",
+				"tags": [
+					"Admin - Banner"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateBanner",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BannerModel"
+								}
+							}
+						}
+					}
+				},
+				"description": "新增後台 banner",
+				"tags": [
+					"Admin - Banner"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateBannerDto"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/admin/banner/{id}": {
+			"get": {
+				"operationId": "GetBanner",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BannerModel"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Banner not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "取得單一後台 banner",
+				"tags": [
+					"Admin - Banner"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "banner ID",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateBanner",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BannerModel"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Banner not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "更新指定banner的內容（只傳要修改的欄位即可）",
+				"tags": [
+					"Admin - Banner"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "banner ID",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateBannerDto"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteBanner",
+				"responses": {
+					"204": {
+						"description": "Deleted"
+					},
+					"404": {
+						"description": "Banner not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "刪除指定banner",
+				"tags": [
+					"Admin - Banner"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "banner ID",
 						"in": "path",
 						"name": "id",
 						"required": true,
