@@ -12,7 +12,7 @@ import {
   Tags,
 } from "tsoa";
 import { BannerService } from "../../services/bannerService";
-import { CreateBannerDto, UpdateBannerDto, Banner as BannerModel } from "./../../models/banner";
+import { CreateBannerDto, UpdateBannerDto, Banner as BannerModel } from "../../models/banner";
 import { ApiResponse } from "../../models/response";
 
 @Route("api/admin/banner")
@@ -24,8 +24,8 @@ export class AdminBannerController extends Controller {
    * 取得所有後台 banner
    */
   @Get("/")
-  public getBanners(): ApiResponse<BannerModel[]> {
-    return { data: this.bannerService.getAll() };
+  public async getBanners(): Promise<ApiResponse<BannerModel[]>> {
+    return { data: await this.bannerService.getAll() };
   }
 
   /**
@@ -35,7 +35,7 @@ export class AdminBannerController extends Controller {
   @Get("{id}")
   @Response<{ message: string }>(404, "Banner not found")
   public async getBanner(@Path() id: string): Promise<ApiResponse<BannerModel>> {
-    const banner = this.bannerService.getById(id);
+    const banner = await this.bannerService.getById(id);
     if (!banner) {
       this.setStatus(404);
       throw new Error("Banner not found");
@@ -50,11 +50,11 @@ export class AdminBannerController extends Controller {
   @SuccessResponse(201, "Created")
   public async createBanner(@Body() body: CreateBannerDto): Promise<ApiResponse<BannerModel>> {
     this.setStatus(201);
-    return { data: this.bannerService.create(body) };
+    return { data: await this.bannerService.create(body) };
   }
 
   /**
-   * 更新指定banner的內容（只傳要修改的欄位即可）
+   * 更新指定 banner 的內容（只傳要修改的欄位即可）
    * @param id banner ID
    */
   @Put("{id}")
@@ -63,7 +63,7 @@ export class AdminBannerController extends Controller {
     @Path() id: string,
     @Body() body: UpdateBannerDto
   ): Promise<ApiResponse<BannerModel>> {
-    const banner = this.bannerService.update(id, body);
+    const banner = await this.bannerService.update(id, body);
     if (!banner) {
       this.setStatus(404);
       throw new Error("Banner not found");
@@ -72,14 +72,14 @@ export class AdminBannerController extends Controller {
   }
 
   /**
-   * 刪除指定banner
+   * 刪除指定 banner
    * @param id banner ID
    */
   @Delete("{id}")
   @SuccessResponse(204, "Deleted")
   @Response<{ message: string }>(404, "Banner not found")
   public async deleteBanner(@Path() id: string): Promise<void> {
-    const success = this.bannerService.delete(id);
+    const success = await this.bannerService.delete(id);
     if (!success) {
       this.setStatus(404);
       throw new Error("Banner not found");

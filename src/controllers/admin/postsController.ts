@@ -25,7 +25,7 @@ export class AdminPostsController extends Controller {
    */
   @Get("/")
   public async getPosts(): Promise<ApiResponse<PostModel[]>> {
-    return { data: this.postsService.getAll() };
+    return { data: await this.postsService.getAll() };
   }
 
   /**
@@ -35,7 +35,7 @@ export class AdminPostsController extends Controller {
   @Get("{id}")
   @Response<{ message: string }>(404, "Post not found")
   public async getPost(@Path() id: string): Promise<ApiResponse<PostModel>> {
-    const post = this.postsService.getById(id);
+    const post = await this.postsService.getById(id);
     if (!post) {
       this.setStatus(404);
       throw new Error("Post not found");
@@ -50,7 +50,7 @@ export class AdminPostsController extends Controller {
   @SuccessResponse(201, "Created")
   public async createPost(@Body() body: CreatePostDto): Promise<ApiResponse<PostModel>> {
     this.setStatus(201);
-    return { data: this.postsService.create(body) };
+    return { data: await this.postsService.create(body) };
   }
 
   /**
@@ -63,7 +63,7 @@ export class AdminPostsController extends Controller {
     @Path() id: string,
     @Body() body: UpdatePostDto
   ): Promise<ApiResponse<PostModel>> {
-    const post = this.postsService.update(id, body);
+    const post = await this.postsService.update(id, body);
     if (!post) {
       this.setStatus(404);
       throw new Error("Post not found");
@@ -79,7 +79,7 @@ export class AdminPostsController extends Controller {
   @SuccessResponse(204, "Deleted")
   @Response<{ message: string }>(404, "Post not found")
   public async deletePost(@Path() id: string): Promise<void> {
-    const success = this.postsService.delete(id);
+    const success = await this.postsService.delete(id);
     if (!success) {
       this.setStatus(404);
       throw new Error("Post not found");

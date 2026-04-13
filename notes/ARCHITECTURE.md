@@ -48,9 +48,12 @@
 │  └────────┬────────────┘    │
 │           │                 │
 │  ┌────────▼────────────┐    │
-│  │  資料 (現在是記憶體) │    │  ← 暫時存在 RAM，之後會換成資料庫
-│  └─────────────────────┘    │
-└─────────────────────────────┘
+│  │    Prisma Client    │    │  ← ORM，把 TypeScript 呼叫轉成 SQL
+│  └────────┬────────────┘    │
+└───────────┼─────────────────┘
+            │
+            ▼
+     PostgreSQL (Docker)
 ```
 
 這個架構叫做 **Controller → Service → Data** 三層架構，是後端最常見的設計方式。
@@ -68,6 +71,8 @@
 | **Tsoa** | 從程式碼自動產生路由和 Swagger 文件 | 像是 Angular 的 `@Component` decorator 自動產生 metadata |
 | **Swagger UI** | 可互動的 API 文件網頁（`/swagger`） | — |
 | **ReDoc** | 美觀的閱讀型 API 文件網頁（`/redoc`） | — |
+| **Prisma** | ORM：用 TypeScript 操作資料庫，自動產生型別 | 像是後端的 HttpClient |
+| **PostgreSQL** | 關聯式資料庫，跑在 Docker 容器裡 | — |
 
 ---
 
@@ -78,27 +83,31 @@ angular-blog-server/
 │
 ├── src/
 │   ├── models/
-│   │   ├── post.ts               ← 定義 Post 資料形狀
-│   │   └── tag.ts                ← 定義 Tag 資料形狀
+│   │   ├── post.ts               ← Post 的 interface（Post、PublicPost、CreatePostDto、UpdatePostDto）
+│   │   ├── tag.ts                ← Tag 的 interface（Tag、PublicTag、CreateTagDto、UpdateTagDto）
+│   │   ├── banner.ts             ← Banner 的 interface（Banner、PublicBanner、CreateBannerDto、UpdateBannerDto）
+│   │   └── response.ts           ← 統一 API 回傳格式 ApiResponse<T>
 │   │
 │   ├── services/
-│   │   ├── postsService.ts       ← Post CRUD 邏輯（記憶體版）
-│   │   ├── postsService.db.ts    ← Post CRUD 邏輯（PostgreSQL 版，備用）
-│   │   └── tagsService.ts        ← Tag CRUD 邏輯
+│   │   ├── postsService.ts       ← Post CRUD（Prisma / PostgreSQL）
+│   │   ├── tagsService.ts        ← Tag CRUD（Prisma / PostgreSQL）
+│   │   └── bannerService.ts      ← Banner CRUD（Prisma / PostgreSQL）
 │   │
 │   ├── controllers/
 │   │   ├── public/               ← 前台：只有讀取，不需要登入
-│   │   │   ├── postsController.ts  (@Route("api/public/posts"))
-│   │   │   └── tagsController.ts   (@Route("api/public/tags"))
+│   │   │   ├── postsController.ts   (@Route("api/public/posts"))
+│   │   │   ├── tagsController.ts    (@Route("api/public/tags"))
+│   │   │   └── bannerController.ts  (@Route("api/public/banner"))
 │   │   └── admin/                ← 後台：完整 CRUD，需要 Authorization header
-│   │       ├── postsController.ts  (@Route("api/admin/posts"))
-│   │       └── tagsController.ts   (@Route("api/admin/tags"))
+│   │       ├── postsController.ts   (@Route("api/admin/posts"))
+│   │       ├── tagsController.ts    (@Route("api/admin/tags"))
+│   │       └── bannerController.ts  (@Route("api/admin/banner"))
 │   │
 │   ├── middleware/
 │   │   └── auth.ts               ← 後台身份驗證，檢查 Authorization header
 │   │
 │   ├── lib/
-│   │   └── prisma.ts             ← Prisma Client 單例（接資料庫時用）
+│   │   └── prisma.ts             ← Prisma Client 單例（避免 hot-reload 時連線數爆炸）
 │   ├── routes.ts                 ← ⚠️ 自動產生，不要手動修改
 │   ├── app.ts                    ← Express 設定：掛載 middleware、文件、路由
 │   └── server.ts                 ← 啟動伺服器（監聽 port）
@@ -107,13 +116,22 @@ angular-blog-server/
 │   └── swagger.json              ← ⚠️ 自動產生，Swagger UI / ReDoc 共用
 │
 ├── prisma/
-│   └── schema.prisma             ← 資料庫 schema（接 PostgreSQL 時用）
+│   ├── schema.prisma             ← 資料庫 schema（Post、Tag、Banner 三張表）
+│   └── migrations/               ← ⚠️ Prisma 自動產生的 SQL 歷史，不要手動修改
+│       ├── 20260413134045_init/
+│       │   └── migration.sql     ← 建立 Post 資料表
+│       └── 20260413151214_add_tag_banner/
+│           └── migration.sql     ← 新增 Tag、Banner 資料表
 │
 ├── notes/                        ← 學習筆記
 │   ├── ARCHITECTURE.md           ← 這份文件
 │   ├── new-resource.md           ← 新增 API 資源的步驟
-│   └── DB_GUIDE.md               ← 接 PostgreSQL 的步驟
+│   ├── DB_GUIDE.md               ← PostgreSQL + Prisma 設定參考
+│   ├── DOCKER_POSTGRES.md        ← 用 Docker 跑 PostgreSQL 的完整指南
+│   └── database.vuerd            ← DB ER 圖設計檔（用 vuerd 開啟）
 │
+├── docker-compose.yml            ← PostgreSQL 容器設定
+├── prisma.config.ts              ← Prisma 7 資料庫連線設定
 ├── tsoa.json                     ← Tsoa 的設定
 ├── tsconfig.json                 ← TypeScript 的設定
 └── package.json
@@ -142,13 +160,24 @@ angular-blog-server/
 
 **完整 API 路徑對照：**
 
-| 動作 | 前台（公開） | 後台（需登入） |
-|------|------------|--------------|
-| 取得所有文章 | GET `/api/public/posts` | GET `/api/admin/posts` |
-| 取得單篇文章 | GET `/api/public/posts/:id` | GET `/api/admin/posts/:id` |
-| 新增文章 | — | POST `/api/admin/posts` |
-| 更新文章 | — | PUT `/api/admin/posts/:id` |
-| 刪除文章 | — | DELETE `/api/admin/posts/:id` |
+| 資源 | 動作 | 前台（公開） | 後台（需登入） |
+|------|------|------------|--------------|
+| **Posts** | 取得全部 | GET `/api/public/posts` | GET `/api/admin/posts` |
+| | 取得單筆 | GET `/api/public/posts/:id` | GET `/api/admin/posts/:id` |
+| | 新增 | — | POST `/api/admin/posts` |
+| | 更新 | — | PUT `/api/admin/posts/:id` |
+| | 刪除 | — | DELETE `/api/admin/posts/:id` |
+| **Tags** | 取得全部 | GET `/api/public/tags` | GET `/api/admin/tags` |
+| | 取得單筆 | GET `/api/public/tags/:id` | GET `/api/admin/tags/:id` |
+| | 新增 | — | POST `/api/admin/tags` |
+| | 更新 | — | PUT `/api/admin/tags/:id` |
+| | 刪除 | — | DELETE `/api/admin/tags/:id` |
+| **Banner** | 取得啟用中 | GET `/api/public/banner` | — |
+| | 取得全部 | — | GET `/api/admin/banner` |
+| | 取得單筆 | — | GET `/api/admin/banner/:id` |
+| | 新增 | — | POST `/api/admin/banner` |
+| | 更新 | — | PUT `/api/admin/banner/:id` |
+| | 刪除 | — | DELETE `/api/admin/banner/:id` |
 
 **為什麼前台也需要讀取的 API？**
 
@@ -197,10 +226,9 @@ Express 的 middleware 按照掛載順序執行。
    - 回傳結果
 
 5. Service 處理
-   - 產生新的 id
-   - 加上 createdAt / updatedAt 時間戳
-   - 把新文章加進 posts 陣列（之後換成資料庫）
-   - 回傳新文章
+   - 呼叫 Prisma Client：`prisma.post.create({ data: dto })`
+   - Prisma 自動產生 UUID、createdAt、updatedAt
+   - PostgreSQL 寫入資料並回傳完整物件
 
 6. 回應前端
    { "id": 2, "title": "My Post", ... }
@@ -214,7 +242,7 @@ Express 的 middleware 按照掛載順序執行。
 ### 6.1 [models/post.ts](../src/models/post.ts) — 資料形狀
 
 ```typescript
-// Post 是完整的文章物件（從資料庫/記憶體讀出來的）
+// Post 是完整的文章物件（從資料庫讀出來的）
 // 後台 controller 回傳這個，包含所有欄位
 export interface Post {
   id: number;
@@ -274,11 +302,12 @@ UUID：GET /api/public/posts/a1b2c3d4-e5f6-7890-abcd-ef1234567890
 → 無法猜測其他 ID，安全性較高
 ```
 
-UUID 由 Node.js 內建的 `crypto.randomUUID()` 產生，不需要安裝套件：
+UUID 由 Prisma schema 的 `@default(uuid())` 自動產生，不需要在程式碼裡手動產生：
 
-```typescript
-import { randomUUID } from "crypto";
-const id = randomUUID(); // "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+```prisma
+model Post {
+  id String @id @default(uuid())  // ← PostgreSQL 在 INSERT 時自動產生 UUID
+}
 ```
 
 **前台 controller 如何轉換：**
@@ -296,30 +325,41 @@ return publicPost; // 型別剛好符合 PublicPost
 
 ### 6.2 [services/postsService.ts](../src/services/postsService.ts) — 業務邏輯
 
+所有 Service 現在都是 **Prisma（非同步）版本**，直接操作 PostgreSQL：
+
 ```typescript
-// 模擬資料庫：目前用 array 存在記憶體裡
-// 伺服器重啟後資料會消失，之後接資料庫就不會有這個問題
-const posts: Post[] = [
-  { id: 1, title: "First Post", ... }
-];
-
-let nextId = 2; // 模擬資料庫的自動遞增 ID
-
 export class PostsService {
-  // 取得全部文章 → 直接回傳陣列
-  getAll(): Post[] { ... }
+  // 所有方法都是 async，回傳 Promise
+  async getAll(): Promise<Post[]> {
+    return prisma.post.findMany({ orderBy: { createdAt: "desc" } });
+  }
 
-  // 根據 id 找文章 → 找不到回傳 undefined
-  getById(id: number): Post | undefined { ... }
+  async getById(id: string): Promise<Post | undefined> {
+    const post = await prisma.post.findUnique({ where: { id } });
+    return post ?? undefined;
+  }
 
-  // 新增文章 → 加上 id 和時間戳後存進陣列
-  create(dto: CreatePostDto): Post { ... }
+  async create(dto: CreatePostDto): Promise<Post> {
+    return prisma.post.create({ data: dto });
+    // Prisma 自動處理：uuid() → id、now() → createdAt、@updatedAt → updatedAt
+  }
 
-  // 更新文章 → 找到後只更新有傳入的欄位
-  update(id: number, dto: UpdatePostDto): Post | undefined { ... }
+  async update(id: string, dto: UpdatePostDto): Promise<Post | undefined> {
+    try {
+      return await prisma.post.update({ where: { id }, data: dto });
+    } catch {
+      return undefined; // Prisma P2025：找不到 id 時 throw，統一回傳 undefined
+    }
+  }
 
-  // 刪除文章 → 從陣列移除，回傳是否成功
-  delete(id: number): boolean { ... }
+  async delete(id: string): Promise<boolean> {
+    try {
+      await prisma.post.delete({ where: { id } });
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }
 ```
 
@@ -329,7 +369,7 @@ export class PostsService {
 - Controller 只管「收請求、回應」
 - Service 只管「怎麼處理資料」
 
-好處：之後要換資料庫時，只需要改 Service 裡的邏輯，Controller 完全不用動。
+好處：之後要換資料庫或 ORM 時，只需要改 Service，Controller 完全不用動。
 
 ---
 
@@ -584,8 +624,10 @@ npm start
 
 按照難度排序：
 
-1. **接資料庫** ← 架構已準備好
-   - 詳見 [DB_GUIDE.md](DB_GUIDE.md)
+1. **接資料庫** ← 已完成
+   - PostgreSQL 跑在 Docker（port 5432），詳見 [DOCKER_POSTGRES.md](DOCKER_POSTGRES.md)
+   - Prisma migration 已執行，`Post`、`Tag`、`Banner` 三張資料表已建立
+   - 所有 Service 已全面換成 Prisma DB 版本
 
 2. **升級 Auth 為真正的 JWT 驗證** ← middleware 架構已建好
    - 安裝 `jsonwebtoken`
@@ -593,10 +635,10 @@ npm start
    - 新增登入 API（`POST /api/public/auth/login`），成功後回傳 JWT token
 
 3. **新增其他資源**
-   - 仿照 posts / tags，詳見 [new-resource.md](new-resource.md)
+   - 仿照 posts / tags / banner，詳見 [new-resource.md](new-resource.md)
 
-4. **環境設定**
-   - 安裝 `dotenv`，把 PORT 等設定移到 `.env` 檔案
+4. **環境設定** ← 已完成
+   - `.env` 已建立，`DATABASE_URL`、`PORT` 皆從環境變數讀取
 
 ---
 

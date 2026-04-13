@@ -1,54 +1,46 @@
-import { randomUUID } from "crypto";
 import { CreatePostDto, Post, UpdatePostDto } from "../models/post";
-
-const posts: Post[] = [
-  {
-    id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    title: "First Post",
-    content: "Hello World!",
-    author: "Admin",
-    createdAt: new Date("2026-01-01"),
-    updatedAt: new Date("2026-01-01"),
-  },
-];
+import { prisma } from "../lib/prisma";
 
 export class PostsService {
-  getAll(): Post[] {
-    return posts;
+  async getAll(): Promise<Post[]> {
+    return prisma.post.findMany({
+      orderBy: { createdAt: "desc" },
+    });
   }
 
-  getById(id: string): Post | undefined {
-    return posts.find((p) => p.id === id);
+  async getById(id: string): Promise<Post | undefined> {
+    const post = await prisma.post.findUnique({
+      where: { id },
+    });
+    return post ?? undefined;
   }
 
-  create(dto: CreatePostDto): Post {
-    const now = new Date();
-    const post: Post = {
-      id: randomUUID(),
-      ...dto,
-      createdAt: now,
-      updatedAt: now,
-    };
-    posts.push(post);
-    return post;
+  async create(dto: CreatePostDto): Promise<Post> {
+    return prisma.post.create({
+      data: dto,
+    });
   }
 
-  update(id: string, dto: UpdatePostDto): Post | undefined {
-    const post = posts.find((p) => p.id === id);
-    if (!post) return undefined;
-
-    if (dto.title !== undefined) post.title = dto.title;
-    if (dto.content !== undefined) post.content = dto.content;
-    if (dto.author !== undefined) post.author = dto.author;
-    post.updatedAt = new Date();
-
-    return post;
+  async update(id: string, dto: UpdatePostDto): Promise<Post | undefined> {
+    try {
+      return await prisma.post.update({
+        where: { id },
+        data: dto,
+      });
+    } catch {
+      // Prisma 找不到 id 時會 throw P2025 錯誤，這裡統一回傳 undefined
+      return undefined;
+    }
   }
 
-  delete(id: string): boolean {
-    const index = posts.findIndex((p) => p.id === id);
-    if (index === -1) return false;
-    posts.splice(index, 1);
-    return true;
+  async delete(id: string): Promise<boolean> {
+    try {
+      await prisma.post.delete({
+        where: { id },
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

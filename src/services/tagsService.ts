@@ -1,41 +1,45 @@
-import { randomUUID } from "crypto";
 import { CreateTagDto, Tag, UpdateTagDto } from "../models/tag";
-
-const tags: Tag[] = [
-  { id: "b2c3d4e5-f6a7-8901-bcde-f12345678901", name: "TypeScript", createdAt: new Date("2026-01-01") },
-  { id: "c3d4e5f6-a7b8-9012-cdef-123456789012", name: "Node.js", createdAt: new Date("2026-01-01") },
-];
+import { prisma } from "../lib/prisma";
 
 export class TagsService {
-  getAll(): Tag[] {
-    return tags;
+  async getAll(): Promise<Tag[]> {
+    return prisma.tag.findMany({
+      orderBy: { createdAt: "desc" },
+    });
   }
 
-  getById(id: string): Tag | undefined {
-    return tags.find((t) => t.id === id);
+  async getById(id: string): Promise<Tag | undefined> {
+    const tag = await prisma.tag.findUnique({
+      where: { id },
+    });
+    return tag ?? undefined;
   }
 
-  create(dto: CreateTagDto): Tag {
-    const tag: Tag = {
-      id: randomUUID(),
-      name: dto.name,
-      createdAt: new Date(),
-    };
-    tags.push(tag);
-    return tag;
+  async create(dto: CreateTagDto): Promise<Tag> {
+    return prisma.tag.create({
+      data: dto,
+    });
   }
 
-  update(id: string, dto: UpdateTagDto): Tag | undefined {
-    const tag = tags.find((t) => t.id === id);
-    if (!tag) return undefined;
-    tag.name = dto.name;
-    return tag;
+  async update(id: string, dto: UpdateTagDto): Promise<Tag | undefined> {
+    try {
+      return await prisma.tag.update({
+        where: { id },
+        data: dto,
+      });
+    } catch {
+      return undefined;
+    }
   }
 
-  delete(id: string): boolean {
-    const index = tags.findIndex((t) => t.id === id);
-    if (index === -1) return false;
-    tags.splice(index, 1);
-    return true;
+  async delete(id: string): Promise<boolean> {
+    try {
+      await prisma.tag.delete({
+        where: { id },
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

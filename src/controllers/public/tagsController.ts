@@ -13,7 +13,8 @@ export class PublicTagsController extends Controller {
    */
   @Get("/")
   public async getTags(): Promise<ApiResponse<PublicTag[]>> {
-    return { data: this.tagsService.getAll().map(({ createdAt, ...tag }) => tag) };
+    const tags = await this.tagsService.getAll();
+    return { data: tags.map(({ createdAt, ...tag }) => tag) };
   }
 
   /**
@@ -23,7 +24,7 @@ export class PublicTagsController extends Controller {
   @Get("{id}")
   @Response<{ message: string }>(404, "Tag not found")
   public async getTag(@Path() id: string): Promise<ApiResponse<PublicTag>> {
-    const tag = this.tagsService.getById(id);
+    const tag = await this.tagsService.getById(id);
     if (!tag) {
       this.setStatus(404);
       throw new Error("Tag not found");

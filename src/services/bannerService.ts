@@ -1,72 +1,59 @@
-import { randomUUID } from "crypto";
-import { Banner, CreateBannerDto, UpdateBannerDto } from './../models/banner';
-
-const banners: Banner []= [{
-  id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  title: "logo+文字",
-  type: "imgText",
-  img: "https://avatars.githubusercontent.com/u/110892385?v=4",
-  isActive: true,
-  content: "# <span style=\"color: #F5992A\">Be my own goddess</span>\n\n程式是種樂趣，是訴說想像的語言無須畏懼",
-  createdAt: new Date("2024-01-15T08:30:00.000Z"),
-  updatedAt: new Date("2024-01-20T12:00:00.000Z")
-}];
+import { Banner, CreateBannerDto, UpdateBannerDto } from "../models/banner";
+import { prisma } from "../lib/prisma";
 
 export class BannerService {
-  /** 取得前台公開的 banner */
-  getPublicBanner(): Banner | undefined {
-    return banners.find((b) => b.isActive);
+  async getPublicBanner(): Promise<Banner | undefined> {
+    const banner = await prisma.banner.findFirst({
+      where: { isActive: true },
+    });
+    return (banner as Banner) ?? undefined;
   }
 
-  getAll(): Banner[] {
-    return banners;
+  async getAll(): Promise<Banner[]> {
+    return prisma.banner.findMany({
+      orderBy: { createdAt: "desc" },
+    }) as Promise<Banner[]>;
   }
 
-  getById(id: string): Banner | undefined {
-    return banners.find((b) => b.id === id);
+  async getById(id: string): Promise<Banner | undefined> {
+    const banner = await prisma.banner.findUnique({
+      where: { id },
+    });
+    return (banner as Banner) ?? undefined;
   }
 
-  create(dto: CreateBannerDto): Banner {
-    const now = new Date();
-    const banner: Banner = {
-      id: randomUUID(),
-      ...dto,
-      isActive: false,
-      createdAt: now,
-      updatedAt: now
-    };
-    banners.push(banner);
-    return banner;
+  async create(dto: CreateBannerDto): Promise<Banner> {
+    return prisma.banner.create({
+      data: { ...dto, isActive: false },
+    }) as Promise<Banner>;
   }
 
-  update(id:string,dto: UpdateBannerDto): Banner | undefined {
-    const banner = this.getById(id);
-    if (!banner) return undefined;
-
-    if (dto.title !== undefined) banner.title = dto.title;
-    if (dto.img !== undefined) banner.img = dto.img;
-    if (dto.content !== undefined) banner.content = dto.content;
-    if (dto.isActive !== undefined) {
+  async update(id: string, dto: UpdateBannerDto): Promise<Banner | undefined> {
+    try {
       if (dto.isActive) {
-        // 啟用這個 banner 的同時，停用其他 banner
-        banners.forEach((b) => {
-          if (b.id !== id) b.isActive = false;
+        // 啟用此 banner 時，先把其他全部設為 inactive
+        await prisma.banner.updateMany({
+          where: { id: { not: id } },
+          data: { isActive: false },
         });
       }
-      banner.isActive = dto.isActive;
-    } 
-
-
-    banner.updatedAt = new Date();
-
-    return banner;
+      return await prisma.banner.update({
+        where: { id },
+        data: dto,
+      }) as Banner;
+    } catch {
+      return undefined;
+    }
   }
 
-  delete(id: string): boolean {
-    const index = banners.findIndex((b) => b.id === id);
-    if (index === -1) return false;
-    banners.splice(index, 1);
-    return true;
+  async delete(id: string): Promise<boolean> {
+    try {
+      await prisma.banner.delete({
+        where: { id },
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
-
 }

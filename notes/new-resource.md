@@ -1,205 +1,262 @@
 # 新增一個 API 資源的步驟
 
-以新增 `Tag` 為例，說明每次新增資源的固定流程。
+以新增 `Comment` 為例，說明每次新增資源的固定流程。
 
 ---
 
 ## 步驟總覽
 
 ```
-1. 建 src/models/xxx.ts
-2. 建 src/services/xxxService.ts
-3. 建 src/controllers/public/xxxController.ts   ← 前台（只讀）
-4. 建 src/controllers/admin/xxxController.ts    ← 後台（完整 CRUD）
-5. 執行 npm run tsoa
+1. 在 prisma/schema.prisma 新增 model
+2. 執行 Prisma migration（建立資料表）
+3. 建 src/models/xxx.ts
+4. 建 src/services/xxxService.ts
+5. 建 src/controllers/public/xxxController.ts   ← 前台（只讀）
+6. 建 src/controllers/admin/xxxController.ts    ← 後台（完整 CRUD）
+7. 執行 npm run tsoa
 ```
 
 ---
 
-## Step 1 — 建立 Model
+## Step 1 — 在 Prisma Schema 新增 model
 
-`src/models/tag.ts`
+`prisma/schema.prisma`
+
+```prisma
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  author    String
+  postId    String           // 關聯到 Post（如果有的話）
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
+
+**常用 Prisma 欄位標記：**
+
+| 標記 | 說明 |
+|------|------|
+| `@id` | 主鍵 |
+| `@default(uuid())` | 自動產生 UUID |
+| `@default(now())` | 自動設定為現在時間 |
+| `@updatedAt` | 每次更新自動更新時間 |
+| `@unique` | 唯一值（不能重複） |
+| `?` 結尾（如 `String?`） | 選填欄位（nullable） |
+
+---
+
+## Step 2 — 執行 Prisma Migration
+
+```bash
+npx prisma migrate dev --name "add_comment"
+npx prisma generate
+```
+
+`migrate dev` 做了三件事：
+1. 讀取 `schema.prisma` 的變更
+2. 產生 SQL 存進 `prisma/migrations/`
+3. 執行 SQL，在資料庫裡建立資料表
+
+---
+
+## Step 3 — 建立 Model（TypeScript interface）
+
+`src/models/comment.ts`
 
 ```typescript
-// 完整的物件（從記憶體/資料庫讀出來的樣子）
-// 後台 controller 回傳這個
-export interface Tag {
-  id: string;   // UUID，用 crypto.randomUUID() 產生
-  name: string;
+/** 後台完整物件（從資料庫讀出來的） */
+export interface Comment {
+  id: string;
+  content: string;
+  author: string;
+  postId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/** 前台公開物件（只暴露前台需要的欄位） */
+export interface PublicComment {
+  id: string;
+  content: string;
+  author: string;
+  postId: string;
   createdAt: Date;
 }
 
-// 前台回傳用：只暴露前台需要的欄位，去掉不必要或敏感的欄位
-export interface PublicTag {
-  id: string;
-  name: string;
+/** 新增時前端要送的欄位（id 和時間戳由後端自動產生） */
+export interface CreateCommentDto {
+  content: string;
+  author: string;
+  postId: string;
 }
 
-// 新增時前端要送的欄位（不含 id、createdAt，這些由後端產生）
-export interface CreateTagDto {
-  name: string;
-}
-
-// 更新時前端要送的欄位（選填的話就加 ?）
-export interface UpdateTagDto {
-  name: string;
+/** 更新時前端要送的欄位（選填） */
+export interface UpdateCommentDto {
+  content?: string;
+  author?: string;
 }
 ```
 
-**為什麼需要 `PublicTag`？**
+**為什麼需要 `PublicComment`？**
 
-前後台看到的資料不一定一樣。`Tag` 是後台完整版（含 `createdAt`），
-`PublicTag` 是前台精簡版，只回傳前台真正需要的欄位。
-之後如果 `Tag` 加了 `internalNote` 之類的欄位，前台也不會意外拿到。
+前後台看到的資料不一定一樣。`Comment` 是後台完整版（含 `updatedAt`），
+`PublicComment` 是前台精簡版，只回傳前台真正需要的欄位。
 
 ---
 
-## Step 2 — 建立 Service
+## Step 4 — 建立 Service（Prisma 版）
 
-`src/services/tagsService.ts`
+`src/services/commentsService.ts`
 
 ```typescript
-import { randomUUID } from "crypto";
-import { CreateTagDto, Tag, UpdateTagDto } from "../models/tag";
+import { prisma } from "../lib/prisma";
+import { Comment, CreateCommentDto, UpdateCommentDto } from "../models/comment";
 
-const tags: Tag[] = [];  // 暫時用記憶體存，之後換成 Prisma
-
-export class TagsService {
-  getAll(): Tag[] {
-    return tags;
+export class CommentsService {
+  async getAll(): Promise<Comment[]> {
+    return prisma.comment.findMany({
+      orderBy: { createdAt: "desc" },
+    });
   }
 
-  getById(id: string): Tag | undefined {
-    return tags.find((t) => t.id === id);
+  async getById(id: string): Promise<Comment | undefined> {
+    const comment = await prisma.comment.findUnique({ where: { id } });
+    return comment ?? undefined;
   }
 
-  create(dto: CreateTagDto): Tag {
-    const tag: Tag = { id: randomUUID(), ...dto, createdAt: new Date() };
-    tags.push(tag);
-    return tag;
+  async create(dto: CreateCommentDto): Promise<Comment> {
+    return prisma.comment.create({ data: dto });
   }
 
-  update(id: string, dto: UpdateTagDto): Tag | undefined {
-    const tag = tags.find((t) => t.id === id);
-    if (!tag) return undefined;
-    tag.name = dto.name;
-    return tag;
+  async update(id: string, dto: UpdateCommentDto): Promise<Comment | undefined> {
+    try {
+      return await prisma.comment.update({ where: { id }, data: dto });
+    } catch {
+      return undefined; // Prisma P2025：id 不存在時 throw，統一回傳 undefined
+    }
   }
 
-  delete(id: string): boolean {
-    const index = tags.findIndex((t) => t.id === id);
-    if (index === -1) return false;
-    tags.splice(index, 1);
-    return true;
+  async delete(id: string): Promise<boolean> {
+    try {
+      await prisma.comment.delete({ where: { id } });
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 ```
 
 ---
 
-## Step 3 — 建立前台 Controller（只讀）
+## Step 5 — 建立前台 Controller（只讀）
 
-`src/controllers/public/tagsController.ts`
+`src/controllers/public/commentsController.ts`
 
 ```typescript
 import { Controller, Get, Path, Route, Tags, Response } from "tsoa";
-import { PublicTag } from "../../models/tag";   // ← 用 PublicTag，不是 Tag
-import { TagsService } from "../../services/tagsService";
+import { PublicComment } from "../../models/comment";
+import { CommentsService } from "../../services/commentsService";
+import { ApiResponse } from "../../models/response";
 
-@Route("api/public/tags")   // ← 前台路徑
-@Tags("Public - Tags")      // ← Swagger 分組
-export class PublicTagsController extends Controller {
-  private tagsService = new TagsService();
+@Route("api/public/comments")
+@Tags("Public - Comments")
+export class PublicCommentsController extends Controller {
+  private commentsService = new CommentsService();
 
   @Get("/")
-  public async getTags(): Promise<PublicTag[]> {
-    // 解構賦值過濾掉不給前台的欄位（這裡去掉 createdAt）
-    return this.tagsService.getAll().map(({ createdAt, ...tag }) => tag);
+  public async getComments(): Promise<ApiResponse<PublicComment[]>> {
+    const comments = await this.commentsService.getAll();
+    // 解構賦值過濾掉不給前台的欄位（這裡去掉 updatedAt）
+    return { data: comments.map(({ updatedAt, ...comment }) => comment) };
   }
 
   @Get("{id}")
-  @Response<{ message: string }>(404, "Tag not found")
-  public async getTag(@Path() id: string): Promise<PublicTag> {
-    const tag = this.tagsService.getById(id);
-    if (!tag) {
+  @Response<{ message: string }>(404, "Comment not found")
+  public async getComment(@Path() id: string): Promise<ApiResponse<PublicComment>> {
+    const comment = await this.commentsService.getById(id);
+    if (!comment) {
       this.setStatus(404);
-      throw new Error("Tag not found");
+      throw new Error("Comment not found");
     }
-    const { createdAt, ...publicTag } = tag;
-    return publicTag;
+    const { updatedAt, ...publicComment } = comment;
+    return { data: publicComment };
   }
 }
 ```
 
 **重點：**
-- return type 宣告為 `PublicTag`（不是 `Tag`）→ Swagger 文件只顯示前台能看到的欄位
-- 用解構賦值 `const { createdAt, ...publicTag } = tag` 過濾欄位
-- Service 完全不用改，轉換只發生在 Controller 層
+- return type 宣告為 `PublicComment`（不是 `Comment`）→ Swagger 文件只顯示前台看到的欄位
+- 用解構賦值過濾欄位，Service 完全不用改
+- 所有 Service 呼叫都要加 `await`（DB 操作是非同步的）
+- 回傳格式用 `ApiResponse<T>` 統一包一層 `{ data: ... }`
 
 ---
 
-## Step 4 — 建立後台 Controller（完整 CRUD）
+## Step 6 — 建立後台 Controller（完整 CRUD）
 
-`src/controllers/admin/tagsController.ts`
+`src/controllers/admin/commentsController.ts`
 
 ```typescript
 import {
   Body, Controller, Delete, Get, Path,
   Post, Put, Route, SuccessResponse, Tags, Response,
 } from "tsoa";
-import { CreateTagDto, Tag, UpdateTagDto } from "../../models/tag";
-import { TagsService } from "../../services/tagsService";
+import { Comment, CreateCommentDto, UpdateCommentDto } from "../../models/comment";
+import { CommentsService } from "../../services/commentsService";
+import { ApiResponse } from "../../models/response";
 
-@Route("api/admin/tags")   // ← 後台路徑（會被 authMiddleware 保護）
-@Tags("Admin - Tags")      // ← Swagger 分組
-export class AdminTagsController extends Controller {
-  private tagsService = new TagsService();
+@Route("api/admin/comments")
+@Tags("Admin - Comments")
+export class AdminCommentsController extends Controller {
+  private commentsService = new CommentsService();
 
   @Get("/")
-  public async getTags(): Promise<Tag[]> {
-    return this.tagsService.getAll();
+  public async getComments(): Promise<ApiResponse<Comment[]>> {
+    return { data: await this.commentsService.getAll() };
   }
 
   @Get("{id}")
-  @Response<{ message: string }>(404, "Tag not found")
-  public async getTag(@Path() id: string): Promise<Tag> {
-    const tag = this.tagsService.getById(id);
-    if (!tag) {
+  @Response<{ message: string }>(404, "Comment not found")
+  public async getComment(@Path() id: string): Promise<ApiResponse<Comment>> {
+    const comment = await this.commentsService.getById(id);
+    if (!comment) {
       this.setStatus(404);
-      throw new Error("Tag not found");
+      throw new Error("Comment not found");
     }
-    return tag;
+    return { data: comment };
   }
 
   @Post("/")
   @SuccessResponse(201, "Created")
-  public async createTag(@Body() body: CreateTagDto): Promise<Tag> {
+  public async createComment(@Body() body: CreateCommentDto): Promise<ApiResponse<Comment>> {
     this.setStatus(201);
-    return this.tagsService.create(body);
+    return { data: await this.commentsService.create(body) };
   }
 
   @Put("{id}")
-  @Response<{ message: string }>(404, "Tag not found")
-  public async updateTag(
+  @Response<{ message: string }>(404, "Comment not found")
+  public async updateComment(
     @Path() id: string,
-    @Body() body: UpdateTagDto
-  ): Promise<Tag> {
-    const tag = this.tagsService.update(id, body);
-    if (!tag) {
+    @Body() body: UpdateCommentDto
+  ): Promise<ApiResponse<Comment>> {
+    const comment = await this.commentsService.update(id, body);
+    if (!comment) {
       this.setStatus(404);
-      throw new Error("Tag not found");
+      throw new Error("Comment not found");
     }
-    return tag;
+    return { data: comment };
   }
 
   @Delete("{id}")
   @SuccessResponse(204, "Deleted")
-  @Response<{ message: string }>(404, "Tag not found")
-  public async deleteTag(@Path() id: string): Promise<void> {
-    const success = this.tagsService.delete(id);
+  @Response<{ message: string }>(404, "Comment not found")
+  public async deleteComment(@Path() id: string): Promise<void> {
+    const success = await this.commentsService.delete(id);
     if (!success) {
       this.setStatus(404);
-      throw new Error("Tag not found");
+      throw new Error("Comment not found");
     }
     this.setStatus(204);
   }
@@ -208,7 +265,7 @@ export class AdminTagsController extends Controller {
 
 ---
 
-## Step 5 — 重新產生路由和文件
+## Step 7 — 重新產生路由和文件
 
 ```bash
 npm run tsoa
@@ -220,7 +277,7 @@ npm run tsoa
 
 **不需要動 `app.ts` 或 `server.ts`。**
 - 後台保護已經用 `app.use("/api/admin", authMiddleware)` 統一處理，新增的 admin controller 自動受保護
-- Tsoa 會自動掃描 `src/controllers/**/*.ts`（包含子資料夾）
+- Tsoa 會自動掃描 `src/controllers/**/*.ts`
 
 ---
 
@@ -230,8 +287,8 @@ npm run tsoa
 |------|---------|---------|-----------|
 | Post | `api/public/posts` | `api/admin/posts` | `PublicPostsController` / `AdminPostsController` |
 | Tag | `api/public/tags` | `api/admin/tags` | `PublicTagsController` / `AdminTagsController` |
+| Banner | `api/public/banner` | `api/admin/banner` | `PublicBannerController` / `AdminBannerController` |
 | Comment | `api/public/comments` | `api/admin/comments` | `PublicCommentsController` / `AdminCommentsController` |
-| User | — | `api/admin/users` | `AdminUsersController` |
 
 規則：
 - Controller Class：`Public資源名稱Controller` / `Admin資源名稱Controller`

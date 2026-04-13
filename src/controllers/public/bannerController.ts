@@ -9,10 +9,10 @@ export class PublicBannerController extends Controller {
   private bannerService = new BannerService();
 
   /**
-   * 取得前台 banner
+   * 取得前台啟用中的 banner
    */
   @Get("/")
-  public getPublicBanner(): ApiResponse<Banner | undefined> {
-    return { data: this.bannerService.getPublicBanner() };
+  public async getPublicBanner(): Promise<ApiResponse<Banner | undefined>> {
+    return { data: await this.bannerService.getPublicBanner() };
   }
 }

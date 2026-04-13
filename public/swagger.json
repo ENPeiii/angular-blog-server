@@ -719,7 +719,7 @@
 						}
 					}
 				},
-				"description": "取得前台 banner",
+				"description": "取得前台啟用中的 banner",
 				"tags": [
 					"Public - Banner"
 				],
@@ -742,7 +742,7 @@
 						}
 					}
 				},
-				"description": "取得所有標籤清單（含後台管理欄位）",
+				"description": "取得所有標籤清單",
 				"tags": [
 					"Admin - Tags"
 				],
@@ -814,7 +814,7 @@
 						}
 					}
 				},
-				"description": "根據 ID 取得單一標籤（含後台管理欄位）",
+				"description": "根據 ID 取得單一標籤",
 				"tags": [
 					"Admin - Tags"
 				],
@@ -1275,7 +1275,7 @@
 						}
 					}
 				},
-				"description": "更新指定banner的內容（只傳要修改的欄位即可）",
+				"description": "更新指定 banner 的內容（只傳要修改的欄位即可）",
 				"tags": [
 					"Admin - Banner"
 				],
@@ -1327,7 +1327,7 @@
 						}
 					}
 				},
-				"description": "刪除指定banner",
+				"description": "刪除指定 banner",
 				"tags": [
 					"Admin - Banner"
 				],

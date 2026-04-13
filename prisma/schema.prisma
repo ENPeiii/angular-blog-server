@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Post {
@@ -12,6 +11,23 @@ model Post {
   title     String
   content   String
   author    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Banner {
+  id        String   @id @default(uuid())
+  title     String
+  type      String
+  img       String
+  isActive  Boolean  @default(false)
+  content   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

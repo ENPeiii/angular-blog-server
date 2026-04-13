@@ -21,21 +21,21 @@ export class AdminTagsController extends Controller {
   private tagsService = new TagsService();
 
   /**
-   * 取得所有標籤清單（含後台管理欄位）
+   * 取得所有標籤清單
    */
   @Get("/")
   public async getTags(): Promise<ApiResponse<Tag[]>> {
-    return { data: this.tagsService.getAll() };
+    return { data: await this.tagsService.getAll() };
   }
 
   /**
-   * 根據 ID 取得單一標籤（含後台管理欄位）
+   * 根據 ID 取得單一標籤
    * @param id 標籤 ID
    */
   @Get("{id}")
   @Response<{ message: string }>(404, "Tag not found")
   public async getTag(@Path() id: string): Promise<ApiResponse<Tag>> {
-    const tag = this.tagsService.getById(id);
+    const tag = await this.tagsService.getById(id);
     if (!tag) {
       this.setStatus(404);
       throw new Error("Tag not found");
@@ -50,7 +50,7 @@ export class AdminTagsController extends Controller {
   @SuccessResponse(201, "Created")
   public async createTag(@Body() body: CreateTagDto): Promise<ApiResponse<Tag>> {
     this.setStatus(201);
-    return { data: this.tagsService.create(body) };
+    return { data: await this.tagsService.create(body) };
   }
 
   /**
@@ -63,7 +63,7 @@ export class AdminTagsController extends Controller {
     @Path() id: string,
     @Body() body: UpdateTagDto
   ): Promise<ApiResponse<Tag>> {
-    const tag = this.tagsService.update(id, body);
+    const tag = await this.tagsService.update(id, body);
     if (!tag) {
       this.setStatus(404);
       throw new Error("Tag not found");
@@ -79,7 +79,7 @@ export class AdminTagsController extends Controller {
   @SuccessResponse(204, "Deleted")
   @Response<{ message: string }>(404, "Tag not found")
   public async deleteTag(@Path() id: string): Promise<void> {
-    const success = this.tagsService.delete(id);
+    const success = await this.tagsService.delete(id);
     if (!success) {
       this.setStatus(404);
       throw new Error("Tag not found");
