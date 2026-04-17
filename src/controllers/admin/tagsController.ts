@@ -15,7 +15,7 @@ import { CreateTagDto, Tag, UpdateTagDto } from "../../models/tag";
 import { TagsService } from "../../services/tagsService";
 import { ApiResponse } from "../../models/response";
 
-@Route("api/admin/tags")
+@Route("admin/tags")
 @Tags("Admin - Tags")
 export class AdminTagsController extends Controller {
   private tagsService = new TagsService();

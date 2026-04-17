@@ -38,11 +38,18 @@ app.get(
   })
 );
 
+// API 路由：/api 前綴統一在這裡定義一次
+const API_PREFIX = "/api";
+const apiRouter = express.Router();
+
+// ⚠️ 順序重要：authMiddleware 必須在 RegisterRoutes 之前
 // 後台路由保護：所有 /api/admin/* 都需要通過 auth 驗證
-app.use("/api/admin", authMiddleware);
+apiRouter.use("/admin", authMiddleware);
 
 // Tsoa generated routes
-RegisterRoutes(app);
+RegisterRoutes(apiRouter);
+
+app.use(API_PREFIX, apiRouter);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

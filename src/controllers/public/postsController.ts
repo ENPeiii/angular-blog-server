@@ -3,7 +3,7 @@ import { PublicPost } from "../../models/post";
 import { PostsService } from "../../services/postsService";
 import { ApiResponse } from "../../models/response";
 
-@Route("api/public/posts")
+@Route("public/posts")
 @Tags("Public - Posts")
 export class PublicPostsController extends Controller {
   private postsService = new PostsService();

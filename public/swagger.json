@@ -556,7 +556,7 @@
 		"contact": {}
 	},
 	"paths": {
-		"/api/public/tags": {
+		"/public/tags": {
 			"get": {
 				"operationId": "GetTags",
 				"responses": {
@@ -579,7 +579,7 @@
 				"parameters": []
 			}
 		},
-		"/api/public/tags/{id}": {
+		"/public/tags/{id}": {
 			"get": {
 				"operationId": "GetTag",
 				"responses": {
@@ -630,7 +630,7 @@
 				]
 			}
 		},
-		"/api/public/posts": {
+		"/public/posts": {
 			"get": {
 				"operationId": "GetPosts",
 				"responses": {
@@ -653,7 +653,7 @@
 				"parameters": []
 			}
 		},
-		"/api/public/posts/{id}": {
+		"/public/posts/{id}": {
 			"get": {
 				"operationId": "GetPost",
 				"responses": {
@@ -704,7 +704,7 @@
 				]
 			}
 		},
-		"/api/public/banner": {
+		"/public/banner": {
 			"get": {
 				"operationId": "GetPublicBanner",
 				"responses": {
@@ -727,7 +727,7 @@
 				"parameters": []
 			}
 		},
-		"/api/admin/tags": {
+		"/admin/tags": {
 			"get": {
 				"operationId": "GetTags",
 				"responses": {
@@ -781,7 +781,7 @@
 				}
 			}
 		},
-		"/api/admin/tags/{id}": {
+		"/admin/tags/{id}": {
 			"get": {
 				"operationId": "GetTag",
 				"responses": {
@@ -933,7 +933,7 @@
 				]
 			}
 		},
-		"/api/admin/posts": {
+		"/admin/posts": {
 			"get": {
 				"operationId": "GetPosts",
 				"responses": {
@@ -987,7 +987,7 @@
 				}
 			}
 		},
-		"/api/admin/posts/{id}": {
+		"/admin/posts/{id}": {
 			"get": {
 				"operationId": "GetPost",
 				"responses": {
@@ -1139,7 +1139,7 @@
 				]
 			}
 		},
-		"/api/admin/banner": {
+		"/admin/banner": {
 			"get": {
 				"operationId": "GetBanners",
 				"responses": {
@@ -1193,7 +1193,7 @@
 				}
 			}
 		},
-		"/api/admin/banner/{id}": {
+		"/admin/banner/{id}": {
 			"get": {
 				"operationId": "GetBanner",
 				"responses": {
@@ -1348,7 +1348,7 @@
 	},
 	"servers": [
 		{
-			"url": "/"
+			"url": "/api"
 		}
 	]
 }

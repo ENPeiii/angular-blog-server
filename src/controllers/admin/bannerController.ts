@@ -15,7 +15,7 @@ import { BannerService } from "../../services/bannerService";
 import { CreateBannerDto, UpdateBannerDto, Banner as BannerModel } from "../../models/banner";
 import { ApiResponse } from "../../models/response";
 
-@Route("api/admin/banner")
+@Route("admin/banner")
 @Tags("Admin - Banner")
 export class AdminBannerController extends Controller {
   private bannerService = new BannerService();

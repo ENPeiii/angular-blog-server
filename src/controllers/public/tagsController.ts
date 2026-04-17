@@ -3,7 +3,7 @@ import { PublicTag } from "../../models/tag";
 import { TagsService } from "../../services/tagsService";
 import { ApiResponse } from "../../models/response";
 
-@Route("api/public/tags")
+@Route("public/tags")
 @Tags("Public - Tags")
 export class PublicTagsController extends Controller {
   private tagsService = new TagsService();

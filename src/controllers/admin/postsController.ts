@@ -15,7 +15,7 @@ import { CreatePostDto, Post as PostModel, UpdatePostDto } from "../../models/po
 import { PostsService } from "../../services/postsService";
 import { ApiResponse } from "../../models/response";
 
-@Route("api/admin/posts")
+@Route("admin/posts")
 @Tags("Admin - Posts")
 export class AdminPostsController extends Controller {
   private postsService = new PostsService();

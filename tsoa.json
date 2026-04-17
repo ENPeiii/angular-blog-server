@@ -5,6 +5,7 @@
   "spec": {
     "outputDirectory": "public",
     "specVersion": 3,
+    "basePath": "/api",
     "info": {
       "title": "Angular Blog API",
       "description": "Blog server REST API",

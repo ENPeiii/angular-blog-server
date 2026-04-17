@@ -266,7 +266,7 @@ export function RegisterRoutes(app: Router) {
     
         const argsPublicTagsController_getTags: Record<string, TsoaRoute.ParameterSchema> = {
         };
-        app.get('/api/public/tags',
+        app.get('/public/tags',
             ...(fetchMiddlewares<RequestHandler>(PublicTagsController)),
             ...(fetchMiddlewares<RequestHandler>(PublicTagsController.prototype.getTags)),
 
@@ -296,7 +296,7 @@ export function RegisterRoutes(app: Router) {
         const argsPublicTagsController_getTag: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
-        app.get('/api/public/tags/:id',
+        app.get('/public/tags/:id',
             ...(fetchMiddlewares<RequestHandler>(PublicTagsController)),
             ...(fetchMiddlewares<RequestHandler>(PublicTagsController.prototype.getTag)),
 
@@ -325,7 +325,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsPublicPostsController_getPosts: Record<string, TsoaRoute.ParameterSchema> = {
         };
-        app.get('/api/public/posts',
+        app.get('/public/posts',
             ...(fetchMiddlewares<RequestHandler>(PublicPostsController)),
             ...(fetchMiddlewares<RequestHandler>(PublicPostsController.prototype.getPosts)),
 
@@ -355,7 +355,7 @@ export function RegisterRoutes(app: Router) {
         const argsPublicPostsController_getPost: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
-        app.get('/api/public/posts/:id',
+        app.get('/public/posts/:id',
             ...(fetchMiddlewares<RequestHandler>(PublicPostsController)),
             ...(fetchMiddlewares<RequestHandler>(PublicPostsController.prototype.getPost)),
 
@@ -384,7 +384,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsPublicBannerController_getPublicBanner: Record<string, TsoaRoute.ParameterSchema> = {
         };
-        app.get('/api/public/banner',
+        app.get('/public/banner',
             ...(fetchMiddlewares<RequestHandler>(PublicBannerController)),
             ...(fetchMiddlewares<RequestHandler>(PublicBannerController.prototype.getPublicBanner)),
 
@@ -413,7 +413,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAdminTagsController_getTags: Record<string, TsoaRoute.ParameterSchema> = {
         };
-        app.get('/api/admin/tags',
+        app.get('/admin/tags',
             ...(fetchMiddlewares<RequestHandler>(AdminTagsController)),
             ...(fetchMiddlewares<RequestHandler>(AdminTagsController.prototype.getTags)),
 
@@ -443,7 +443,7 @@ export function RegisterRoutes(app: Router) {
         const argsAdminTagsController_getTag: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
-        app.get('/api/admin/tags/:id',
+        app.get('/admin/tags/:id',
             ...(fetchMiddlewares<RequestHandler>(AdminTagsController)),
             ...(fetchMiddlewares<RequestHandler>(AdminTagsController.prototype.getTag)),
 
@@ -473,7 +473,7 @@ export function RegisterRoutes(app: Router) {
         const argsAdminTagsController_createTag: Record<string, TsoaRoute.ParameterSchema> = {
                 body: {"in":"body","name":"body","required":true,"ref":"CreateTagDto"},
         };
-        app.post('/api/admin/tags',
+        app.post('/admin/tags',
             ...(fetchMiddlewares<RequestHandler>(AdminTagsController)),
             ...(fetchMiddlewares<RequestHandler>(AdminTagsController.prototype.createTag)),
 
@@ -504,7 +504,7 @@ export function RegisterRoutes(app: Router) {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
                 body: {"in":"body","name":"body","required":true,"ref":"UpdateTagDto"},
         };
-        app.put('/api/admin/tags/:id',
+        app.put('/admin/tags/:id',
             ...(fetchMiddlewares<RequestHandler>(AdminTagsController)),
             ...(fetchMiddlewares<RequestHandler>(AdminTagsController.prototype.updateTag)),
 
@@ -534,7 +534,7 @@ export function RegisterRoutes(app: Router) {
         const argsAdminTagsController_deleteTag: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
-        app.delete('/api/admin/tags/:id',
+        app.delete('/admin/tags/:id',
             ...(fetchMiddlewares<RequestHandler>(AdminTagsController)),
             ...(fetchMiddlewares<RequestHandler>(AdminTagsController.prototype.deleteTag)),
 
@@ -563,7 +563,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAdminPostsController_getPosts: Record<string, TsoaRoute.ParameterSchema> = {
         };
-        app.get('/api/admin/posts',
+        app.get('/admin/posts',
             ...(fetchMiddlewares<RequestHandler>(AdminPostsController)),
             ...(fetchMiddlewares<RequestHandler>(AdminPostsController.prototype.getPosts)),
 
@@ -593,7 +593,7 @@ export function RegisterRoutes(app: Router) {
         const argsAdminPostsController_getPost: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
-        app.get('/api/admin/posts/:id',
+        app.get('/admin/posts/:id',
             ...(fetchMiddlewares<RequestHandler>(AdminPostsController)),
             ...(fetchMiddlewares<RequestHandler>(AdminPostsController.prototype.getPost)),
 
@@ -623,7 +623,7 @@ export function RegisterRoutes(app: Router) {
         const argsAdminPostsController_createPost: Record<string, TsoaRoute.ParameterSchema> = {
                 body: {"in":"body","name":"body","required":true,"ref":"CreatePostDto"},
         };
-        app.post('/api/admin/posts',
+        app.post('/admin/posts',
             ...(fetchMiddlewares<RequestHandler>(AdminPostsController)),
             ...(fetchMiddlewares<RequestHandler>(AdminPostsController.prototype.createPost)),
 
@@ -654,7 +654,7 @@ export function RegisterRoutes(app: Router) {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
                 body: {"in":"body","name":"body","required":true,"ref":"UpdatePostDto"},
         };
-        app.put('/api/admin/posts/:id',
+        app.put('/admin/posts/:id',
             ...(fetchMiddlewares<RequestHandler>(AdminPostsController)),
             ...(fetchMiddlewares<RequestHandler>(AdminPostsController.prototype.updatePost)),
 
@@ -684,7 +684,7 @@ export function RegisterRoutes(app: Router) {
         const argsAdminPostsController_deletePost: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
-        app.delete('/api/admin/posts/:id',
+        app.delete('/admin/posts/:id',
             ...(fetchMiddlewares<RequestHandler>(AdminPostsController)),
             ...(fetchMiddlewares<RequestHandler>(AdminPostsController.prototype.deletePost)),
 
@@ -713,7 +713,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAdminBannerController_getBanners: Record<string, TsoaRoute.ParameterSchema> = {
         };
-        app.get('/api/admin/banner',
+        app.get('/admin/banner',
             ...(fetchMiddlewares<RequestHandler>(AdminBannerController)),
             ...(fetchMiddlewares<RequestHandler>(AdminBannerController.prototype.getBanners)),
 
@@ -743,7 +743,7 @@ export function RegisterRoutes(app: Router) {
         const argsAdminBannerController_getBanner: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
-        app.get('/api/admin/banner/:id',
+        app.get('/admin/banner/:id',
             ...(fetchMiddlewares<RequestHandler>(AdminBannerController)),
             ...(fetchMiddlewares<RequestHandler>(AdminBannerController.prototype.getBanner)),
 
@@ -773,7 +773,7 @@ export function RegisterRoutes(app: Router) {
         const argsAdminBannerController_createBanner: Record<string, TsoaRoute.ParameterSchema> = {
                 body: {"in":"body","name":"body","required":true,"ref":"CreateBannerDto"},
         };
-        app.post('/api/admin/banner',
+        app.post('/admin/banner',
             ...(fetchMiddlewares<RequestHandler>(AdminBannerController)),
             ...(fetchMiddlewares<RequestHandler>(AdminBannerController.prototype.createBanner)),
 
@@ -804,7 +804,7 @@ export function RegisterRoutes(app: Router) {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
                 body: {"in":"body","name":"body","required":true,"ref":"UpdateBannerDto"},
         };
-        app.put('/api/admin/banner/:id',
+        app.put('/admin/banner/:id',
             ...(fetchMiddlewares<RequestHandler>(AdminBannerController)),
             ...(fetchMiddlewares<RequestHandler>(AdminBannerController.prototype.updateBanner)),
 
@@ -834,7 +834,7 @@ export function RegisterRoutes(app: Router) {
         const argsAdminBannerController_deleteBanner: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
-        app.delete('/api/admin/banner/:id',
+        app.delete('/admin/banner/:id',
             ...(fetchMiddlewares<RequestHandler>(AdminBannerController)),
             ...(fetchMiddlewares<RequestHandler>(AdminBannerController.prototype.deleteBanner)),
 

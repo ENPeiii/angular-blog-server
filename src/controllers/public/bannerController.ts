@@ -3,7 +3,7 @@ import { BannerService } from "../../services/bannerService";
 import { Banner } from "../../models/banner";
 import { ApiResponse } from "../../models/response";
 
-@Route("api/public/banner")
+@Route("public/banner")
 @Tags("Public - Banner")
 export class PublicBannerController extends Controller {
   private bannerService = new BannerService();
