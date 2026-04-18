@@ -132,7 +132,6 @@ angular-blog-server/
 │   └── database.vuerd            ← DB ER 圖設計檔（用 vuerd 開啟）
 │
 ├── docker-compose.yml            ← PostgreSQL 容器設定
-├── prisma.config.ts              ← Prisma 7 資料庫連線設定
 ├── tsoa.json                     ← Tsoa 的設定
 ├── tsconfig.json                 ← TypeScript 的設定
 └── package.json
