@@ -7,13 +7,15 @@ export interface Banner {
   /** banner 名稱 @example "logo+文字" */
   title: string;
   /** banner 類型 @example "imgText" */
-  type: BannerType;
-  /** 圖片網址 */
-  img: string;
+  type: string;
+  /** 圖片網址 @example "https://example.com/banner.jpg" */
+  imgUrl: string;
+  /** 圖片替代文字 @example "首頁 Banner" */
+  imgAlt: string;
   /** 是否啟用 */
   isActive: boolean;
   /** 內容 */
-  content?: string;
+  content: string | null;
   /** 建立時間（UTC） @example "2024-01-15T08:30:00.000Z" */
   createdAt: Date;
   /** 最後更新時間（UTC），未更新過則為 null @example "2024-01-20T12:00:00.000Z" */
@@ -27,11 +29,13 @@ export interface PublicBanner{
   /** banner 名稱 @example "logo+文字" */
   title: string;
   /** banner 類型 @example "imgText" */
-  type: BannerType;
-  /** 圖片網址 */
-  img: string;
+  type: string;
+  /** 圖片網址 @example "https://example.com/banner.jpg" */
+  imgUrl: string;
+  /** 圖片替代文字 @example "首頁 Banner" */
+  imgAlt: string;
   /** 內容 */
-  content?: string;
+  content: string | null;
 }
 
 export interface CreateBannerDto {
@@ -39,8 +43,10 @@ export interface CreateBannerDto {
   title: string;
   /** banner 類型 @example "imgText" */
   type: BannerType;
-  /** 圖片網址 */
-  img: string;
+  /** 圖片網址 @example "https://example.com/banner.jpg" */
+  imgUrl: string;
+  /** 圖片替代文字 @example "首頁 Banner" */
+  imgAlt: string;
   /** 內容 */
   content?: string;
 }
@@ -48,8 +54,10 @@ export interface CreateBannerDto {
 export interface UpdateBannerDto {
   /** banner 名稱 @example "logo+文字" */
   title?: string;
-  /** 圖片網址 */
-  img?: string;
+  /** 圖片網址 @example "https://example.com/banner.jpg" */
+  imgUrl?: string;
+  /** 圖片替代文字 @example "首頁 Banner" */
+  imgAlt?: string;
   /** 內容 */
   content?: string;
   /** 是否啟用 */

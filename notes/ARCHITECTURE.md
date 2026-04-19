@@ -83,18 +83,18 @@
 angular-blog-server/
 │
 ├── src/
-│   ├── models/
+│   ├── models/          ✏️ 你維護
 │   │   ├── post.ts               ← Post 的 interface（Post、PublicPost、CreatePostDto、UpdatePostDto）
 │   │   ├── tag.ts                ← Tag 的 interface（Tag、PublicTag、CreateTagDto、UpdateTagDto）
 │   │   ├── banner.ts             ← Banner 的 interface（Banner、PublicBanner、CreateBannerDto、UpdateBannerDto）
 │   │   └── response.ts           ← 統一 API 回傳格式 ApiResponse<T>
 │   │
-│   ├── services/
+│   ├── services/        ✏️ 你維護
 │   │   ├── postsService.ts       ← Post CRUD（Prisma / PostgreSQL）
 │   │   ├── tagsService.ts        ← Tag CRUD（Prisma / PostgreSQL）
 │   │   └── bannerService.ts      ← Banner CRUD（Prisma / PostgreSQL）
 │   │
-│   ├── controllers/
+│   ├── controllers/     ✏️ 你維護
 │   │   ├── public/               ← 前台：只有讀取，不需要登入
 │   │   │   ├── postsController.ts   (@Route("public/posts"))
 │   │   │   ├── tagsController.ts    (@Route("public/tags"))
@@ -104,49 +104,53 @@ angular-blog-server/
 │   │       ├── tagsController.ts    (@Route("admin/tags"))
 │   │       └── bannerController.ts  (@Route("admin/banner"))
 │   │
-│   ├── middleware/
+│   ├── middleware/      ✏️ 你維護
 │   │   └── auth.ts               ← 後台身份驗證，檢查 Authorization header
 │   │
-│   ├── lib/
+│   ├── lib/             ✏️ 你維護
 │   │   └── prisma.ts             ← Prisma Client 單例（避免 hot-reload 時連線數爆炸）
-│   ├── routes.ts                 ← ⚠️ 自動產生，不要手動修改
-│   ├── app.ts                    ← Express 設定：掛載 middleware、文件、路由
-│   └── server.ts                 ← 啟動伺服器（監聽 port）
+│   ├── routes.ts        🤖 自動產生（npm run tsoa），不要手動修改
+│   ├── app.ts           ✏️ 你維護 — Express 設定：掛載 middleware、文件、路由
+│   └── server.ts        ✏️ 你維護 — 啟動伺服器（監聽 port）
 │
 ├── public/
-│   └── swagger.json              ← ⚠️ 自動產生，Swagger UI / ReDoc 共用
+│   └── swagger.json     🤖 自動產生（npm run tsoa），不要手動修改
 │
 ├── prisma/
-│   ├── schema.prisma             ← 資料庫 schema（Post、Tag、Banner 三張表）
-│   └── migrations/               ← ⚠️ Prisma 自動產生的 SQL 歷史，不要手動修改
+│   ├── schema.prisma    ✏️ 你維護 — 資料庫 schema（定義資料表長什麼樣）
+│   └── migrations/      🤖 自動產生（npx prisma migrate dev），不要手動修改
 │       ├── 20260413134045_init/
-│       │   └── migration.sql     ← 建立 Post 資料表
-│       └── 20260413151214_add_tag_banner/
-│           └── migration.sql     ← 新增 Tag、Banner 資料表
+│       │   └── migration.sql
+│       ├── 20260413151214_add_tag_banner/
+│       │   └── migration.sql
+│       └── 20260419113942_banner_img_to_imgUrl_imgAlt/
+│           └── migration.sql
 │
-├── notes/                        ← 學習筆記
+├── notes/               ✏️ 你維護 — 學習筆記
 │   ├── ARCHITECTURE.md           ← 這份文件
 │   ├── COMMANDS.md               ← 常用指令速查（npm、Docker、Prisma）
 │   ├── DOCKER_POSTGRES.md        ← 環境建立：Docker + PostgreSQL + Prisma 從零到跑起來
 │   ├── new-resource.md           ← 開發日常：新增資源、欄位、常用 Prisma 指令
 │   └── database.vuerd            ← DB ER 圖設計檔（用 vuerd 開啟）
 │
-├── docker-compose.yml            ← PostgreSQL 容器設定
-├── prisma.config.ts              ← Prisma 7 必要：Studio 從這裡讀 DATABASE_URL（schema.prisma 的 env() 不夠）
-├── tsoa.json                     ← Tsoa 的設定
-├── tsconfig.json                 ← TypeScript 的設定
-└── package.json
+├── docker-compose.yml   ✏️ 你維護 — PostgreSQL 容器設定
+├── prisma.config.ts     ✏️ 你維護 — Prisma 7 必要設定（見下方說明）
+├── tsoa.json            ✏️ 你維護 — Tsoa 的設定
+├── tsconfig.json        ✏️ 你維護 — TypeScript 的設定
+└── package.json         ✏️ 你維護
 ```
 
-**哪些檔案你會常常改：**
-- `src/models/` — 新增或修改資料結構
-- `src/services/` — 新增或修改業務邏輯
-- `src/controllers/public/` — 新增或修改前台 API
-- `src/controllers/admin/` — 新增或修改後台 API
+**一眼判斷：這個檔案我能不能改？**
 
-**哪些檔案不要手動改：**
-- `src/routes.ts` — Tsoa 自動產生
-- `public/swagger.json` — Tsoa 自動產生
+| 符號 | 意思 |
+|------|------|
+| ✏️ 你維護 | 可以改，這是你的程式碼 |
+| 🤖 自動產生 | 不要手動改，下次跑指令就會被覆蓋掉 |
+
+自動產生的只有兩個地方：
+- `src/routes.ts` — 每次 `npm run tsoa` 覆蓋
+- `public/swagger.json` — 每次 `npm run tsoa` 覆蓋
+- `prisma/migrations/` 裡的 SQL 檔案 — 每次 `npx prisma migrate dev` 新增
 
 ---
 
@@ -627,6 +631,37 @@ const post = await prisma.post.findUnique({ where: { id } });
 
 ---
 
+### Prisma 7 的設定方式 — `prisma.config.ts`
+
+> ⚠️ 這是 Prisma 7 的重要規則，和網路上舊版教學不同。
+
+**Prisma 7 開始，資料庫連線 URL 不能放在 `schema.prisma`，必須放在 `prisma.config.ts`：**
+
+```typescript
+// prisma.config.ts（✏️ 你維護，不要刪）
+import { defineConfig } from 'prisma/config'
+import 'dotenv/config'
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  datasource: {
+    url: process.env.DATABASE_URL,  // ← 從 .env 讀取
+  },
+})
+```
+
+```prisma
+// prisma/schema.prisma — 注意：沒有 url 欄位，這是正確的
+datasource db {
+  provider = "postgresql"
+  // ⚠️ 不要加 url = env("DATABASE_URL")，Prisma 7 不支援
+}
+```
+
+`prisma.config.ts` 不是選用的，是必要的。所有 Prisma CLI 指令（migrate、generate、studio）都靠它找到資料庫。
+
+---
+
 ### Prisma 幫你做了四件事
 
 #### 1. 定義資料庫結構 — `prisma/schema.prisma`
@@ -680,6 +715,10 @@ CREATE TABLE "Post" (
 
 這個資料夾是 **資料庫變更的歷史記錄**，不要手動修改，要 commit 進 git。
 
+> ⚠️ `npx prisma migrate dev` 是互動式指令，必須在你自己的終端機視窗跑。
+> 若資料表裡已有資料，新增 NOT NULL 欄位時 Prisma 會提示你需要補 default 值或手動修改 SQL，
+> 按照提示操作即可。詳見 [new-resource.md](new-resource.md)。
+
 #### 4. 執行查詢 — Prisma Client
 
 實際在程式執行時，Prisma Client 把你的 TypeScript 呼叫翻譯成 SQL 送給 PostgreSQL：
@@ -699,19 +738,30 @@ CREATE TABLE "Post" (
 ### Prisma Client 為什麼要做成單例？ — `src/lib/prisma.ts`
 
 ```typescript
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 export const prisma =
-  globalForPrisma.prisma || new PrismaClient({ log: ["query", "error", "warn"] });
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
+    log: ["query", "error", "warn"],
+  });
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
 ```
 
-Node.js 開發時，每次存檔 hot-reload 都會重新 import 這個檔案。
-如果直接 `new PrismaClient()`，每次 reload 就會建立一個新的資料庫連線，最終超過 PostgreSQL 的連線數上限。
-把 instance 存在 `globalThis` 上，reload 後就能複用同一個連線。
+兩個重點：
+
+**為什麼用 adapter（`PrismaPg`）？**
+Prisma 7 把資料庫驅動和 ORM 分開。`prisma.config.ts` 提供 URL 給 CLI（migrate、studio），`PrismaPg` 則是 runtime 實際建立 PostgreSQL 連線用的。兩者分工，各司其職。
+
+**為什麼要做成單例？**
+Node.js 開發時，每次存檔 hot-reload 都會重新 import 這個檔案。若直接 `new PrismaClient()`，每次 reload 建一個新連線，很快就會超過 PostgreSQL 的連線上限。把 instance 存在 `globalThis` 上，reload 後就能複用同一個連線。
 
 ---
 
@@ -719,7 +769,7 @@ Node.js 開發時，每次存檔 hot-reload 都會重新 import 這個檔案。
 
 | 指令 | 做什麼 | 什麼時候用 |
 |------|--------|-----------|
-| `npx prisma migrate dev --name <描述>` | 比對 schema 差異，產生 SQL migration 檔並套用到 DB | 改了 `schema.prisma` 之後 |
+| `npx prisma migrate dev --name <描述>` | 比對 schema 差異，產生 SQL migration 檔並套用到 DB | 改了 `schema.prisma` 之後（需在你的終端機互動執行） |
 | `npx prisma generate` | 重新產生 `@prisma/client` TypeScript 型別 | migrate 後會自動執行，通常不需手動 |
 | `npx prisma studio` | 開啟瀏覽器視覺化資料庫管理介面 | 想直接查看或修改資料時 |
 | `npx prisma db push` | 直接把 schema 同步到 DB（不產生 migration 檔） | 快速實驗用，正式環境不推薦 |

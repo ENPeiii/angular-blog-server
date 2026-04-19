@@ -75,30 +75,23 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "BannerType": {
-        "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["img"]},{"dataType":"enum","enums":["imgText"]}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Banner": {
+    "PublicBanner": {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"string","required":true},
             "title": {"dataType":"string","required":true},
-            "type": {"ref":"BannerType","required":true},
-            "img": {"dataType":"string","required":true},
-            "isActive": {"dataType":"boolean","required":true},
-            "content": {"dataType":"string"},
-            "createdAt": {"dataType":"datetime","required":true},
-            "updatedAt": {"dataType":"datetime","required":true},
+            "type": {"dataType":"string","required":true},
+            "imgUrl": {"dataType":"string","required":true},
+            "imgAlt": {"dataType":"string","required":true},
+            "content": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
         },
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ApiResponse_Banner-or-undefined_": {
+    "ApiResponse_PublicBanner-or-undefined_": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"union","subSchemas":[{"ref":"Banner"},{"dataType":"undefined"}],"required":true},
+            "data": {"dataType":"union","subSchemas":[{"ref":"PublicBanner"},{"dataType":"undefined"}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -199,10 +192,11 @@ const models: TsoaRoute.Models = {
         "properties": {
             "id": {"dataType":"string","required":true},
             "title": {"dataType":"string","required":true},
-            "type": {"ref":"BannerType","required":true},
-            "img": {"dataType":"string","required":true},
+            "type": {"dataType":"string","required":true},
+            "imgUrl": {"dataType":"string","required":true},
+            "imgAlt": {"dataType":"string","required":true},
             "isActive": {"dataType":"boolean","required":true},
-            "content": {"dataType":"string"},
+            "content": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
             "createdAt": {"dataType":"datetime","required":true},
             "updatedAt": {"dataType":"datetime","required":true},
         },
@@ -225,12 +219,18 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "BannerType": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["img"]},{"dataType":"enum","enums":["imgText"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateBannerDto": {
         "dataType": "refObject",
         "properties": {
             "title": {"dataType":"string","required":true},
             "type": {"ref":"BannerType","required":true},
-            "img": {"dataType":"string","required":true},
+            "imgUrl": {"dataType":"string","required":true},
+            "imgAlt": {"dataType":"string","required":true},
             "content": {"dataType":"string"},
         },
         "additionalProperties": false,
@@ -240,7 +240,8 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "title": {"dataType":"string"},
-            "img": {"dataType":"string"},
+            "imgUrl": {"dataType":"string"},
+            "imgAlt": {"dataType":"string"},
             "content": {"dataType":"string"},
             "isActive": {"dataType":"boolean"},
         },

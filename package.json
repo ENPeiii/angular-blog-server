@@ -7,8 +7,8 @@
     "build": "tsoa spec-and-routes && tsc",
     "tsoa": "tsoa spec-and-routes",
     "docker": "docker compose up -d",
-    "studio": "npx prisma studio",
-    "dev": "concurrently \"nodemon\" \"npx tsoa spec-and-routes --watch\"",
+    "studio": "prisma studio",
+    "dev": "concurrently \"nodemon\" \"tsoa spec-and-routes --watch\"",
     "start": "node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

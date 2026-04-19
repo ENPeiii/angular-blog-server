@@ -126,14 +126,8 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"BannerType": {
-				"type": "string",
-				"enum": [
-					"img",
-					"imgText"
-				]
-			},
-			"Banner": {
+			"PublicBanner": {
+				"description": "前台公開 banner 物件（不含後台管理欄位）",
 				"properties": {
 					"id": {
 						"type": "string",
@@ -146,52 +140,42 @@
 						"example": "logo+文字"
 					},
 					"type": {
-						"$ref": "#/components/schemas/BannerType",
+						"type": "string",
 						"description": "banner 類型",
 						"example": "imgText"
 					},
-					"img": {
+					"imgUrl": {
 						"type": "string",
-						"description": "圖片網址"
+						"description": "圖片網址",
+						"example": "https://example.com/banner.jpg"
 					},
-					"isActive": {
-						"type": "boolean",
-						"description": "是否啟用"
+					"imgAlt": {
+						"type": "string",
+						"description": "圖片替代文字",
+						"example": "首頁 Banner"
 					},
 					"content": {
 						"type": "string",
+						"nullable": true,
 						"description": "內容"
-					},
-					"createdAt": {
-						"type": "string",
-						"format": "date-time",
-						"description": "建立時間（UTC）",
-						"example": "2024-01-15T08:30:00.000Z"
-					},
-					"updatedAt": {
-						"type": "string",
-						"format": "date-time",
-						"description": "最後更新時間（UTC），未更新過則為 null",
-						"example": "2024-01-20T12:00:00.000Z"
 					}
 				},
 				"required": [
 					"id",
 					"title",
 					"type",
-					"img",
-					"isActive",
-					"createdAt",
-					"updatedAt"
+					"imgUrl",
+					"imgAlt",
+					"content"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ApiResponse_Banner-or-undefined_": {
+			"ApiResponse_PublicBanner-or-undefined_": {
 				"description": "統一 API 回傳格式",
 				"properties": {
 					"data": {
-						"$ref": "#/components/schemas/Banner"
+						"$ref": "#/components/schemas/PublicBanner"
 					}
 				},
 				"type": "object",
@@ -422,13 +406,19 @@
 						"example": "logo+文字"
 					},
 					"type": {
-						"$ref": "#/components/schemas/BannerType",
+						"type": "string",
 						"description": "banner 類型",
 						"example": "imgText"
 					},
-					"img": {
+					"imgUrl": {
 						"type": "string",
-						"description": "圖片網址"
+						"description": "圖片網址",
+						"example": "https://example.com/banner.jpg"
+					},
+					"imgAlt": {
+						"type": "string",
+						"description": "圖片替代文字",
+						"example": "首頁 Banner"
 					},
 					"isActive": {
 						"type": "boolean",
@@ -436,6 +426,7 @@
 					},
 					"content": {
 						"type": "string",
+						"nullable": true,
 						"description": "內容"
 					},
 					"createdAt": {
@@ -455,8 +446,10 @@
 					"id",
 					"title",
 					"type",
-					"img",
+					"imgUrl",
+					"imgAlt",
 					"isActive",
+					"content",
 					"createdAt",
 					"updatedAt"
 				],
@@ -492,6 +485,13 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"BannerType": {
+				"type": "string",
+				"enum": [
+					"img",
+					"imgText"
+				]
+			},
 			"CreateBannerDto": {
 				"properties": {
 					"title": {
@@ -504,9 +504,15 @@
 						"description": "banner 類型",
 						"example": "imgText"
 					},
-					"img": {
+					"imgUrl": {
 						"type": "string",
-						"description": "圖片網址"
+						"description": "圖片網址",
+						"example": "https://example.com/banner.jpg"
+					},
+					"imgAlt": {
+						"type": "string",
+						"description": "圖片替代文字",
+						"example": "首頁 Banner"
 					},
 					"content": {
 						"type": "string",
@@ -516,7 +522,8 @@
 				"required": [
 					"title",
 					"type",
-					"img"
+					"imgUrl",
+					"imgAlt"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -528,9 +535,15 @@
 						"description": "banner 名稱",
 						"example": "logo+文字"
 					},
-					"img": {
+					"imgUrl": {
 						"type": "string",
-						"description": "圖片網址"
+						"description": "圖片網址",
+						"example": "https://example.com/banner.jpg"
+					},
+					"imgAlt": {
+						"type": "string",
+						"description": "圖片替代文字",
+						"example": "首頁 Banner"
 					},
 					"content": {
 						"type": "string",
@@ -713,7 +726,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_Banner-or-undefined_"
+									"$ref": "#/components/schemas/ApiResponse_PublicBanner-or-undefined_"
 								}
 							}
 						}

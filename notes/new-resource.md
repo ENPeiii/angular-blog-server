@@ -49,13 +49,28 @@ model Comment {
 ## Step 2 — 執行 Prisma Migration
 
 ```bash
+# ⚠️ 互動式指令，必須在你自己的終端機視窗執行
 npx prisma migrate dev --name "add_comment"
 ```
 
 `migrate dev` 做了三件事：
 1. 讀取 `schema.prisma` 的變更
-2. 產生 SQL 存進 `prisma/migrations/`
+2. 產生 SQL 存進 `prisma/migrations/`（🤖 自動產生，不要手動改）
 3. 執行 SQL，在資料庫裡建立資料表
+
+**若資料表已有資料，新增 NOT NULL 欄位會失敗：**
+
+Prisma 會報錯說現有資料沒有值可以填入。解法：在 schema 補 `@default` 或改為選填：
+
+```prisma
+// 方案 A：給預設值（現有資料自動填入，之後新資料由程式提供）
+newColumn String @default("")
+
+// 方案 B：改為選填（nullable，現有資料填 null）
+newColumn String?
+```
+
+加了 `@default` 後再跑一次 `migrate dev` 就能正常執行。
 
 ---
 
@@ -344,10 +359,11 @@ slug  String @default("") // 有預設值，現有資料自動填空字串
 ### Step 2 — 執行 Migration
 
 ```bash
+# ⚠️ 互動式指令，必須在你自己的終端機視窗執行
 npx prisma migrate dev --name "add_slug_to_post"
 ```
 
-Prisma 會自動產生對應的 SQL 並套用到資料庫：
+Prisma 會自動產生對應的 SQL 並套用到資料庫（🤖 自動產生，不要手動改）：
 
 ```sql
 -- prisma/migrations/xxxxxxxx_add_slug_to_post/migration.sql
