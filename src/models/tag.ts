@@ -1,16 +1,18 @@
 /** 後台完整標籤物件 */
 export interface Tag {
-  /** 標籤唯一識別碼（UUID，由後端自動產生） @example "b2c3d4e5-f6a7-8901-bcde-f12345678901" */
+  /** 標籤id（前端當作路由使用） @example "typescript"*/
   id: string;
   /** 標籤名稱 @example "TypeScript" */
   name: string;
   /** 建立時間（UTC） @example "2024-01-15T08:30:00.000Z" */
   createdAt: Date;
+  /** 最後更新時間（UTC），未更新過則為 null @example "2024-01-20T12:00:00.000Z" */
+  updatedAt: Date;
 }
 
 /** 前台公開標籤物件（不含後台管理欄位） */
 export interface PublicTag {
-  /** 標籤唯一識別碼（UUID） @example "b2c3d4e5-f6a7-8901-bcde-f12345678901" */
+  /** 標籤 slug（前端當作路由使用） @example "typescript" */
   id: string;
   /** 標籤名稱 @example "TypeScript" */
   name: string;

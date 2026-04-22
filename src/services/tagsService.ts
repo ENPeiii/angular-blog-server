@@ -1,3 +1,4 @@
+import { toSlug } from "../lib/slug";
 import { CreateTagDto, Tag, UpdateTagDto } from "../models/tag";
 import { prisma } from "../lib/prisma";
 
@@ -17,7 +18,10 @@ export class TagsService {
 
   async create(dto: CreateTagDto): Promise<Tag> {
     return prisma.tag.create({
-      data: dto,
+      data: {
+        id: toSlug(dto.name),
+        name: dto.name,
+      },
     });
   }
 

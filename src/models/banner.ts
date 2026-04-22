@@ -1,5 +1,4 @@
-
-type BannerType = 'img' | 'imgText';
+import { BannerType } from "@prisma/client";
 
 export interface Banner {
   /** 唯一識別碼（UUID，由後端自動產生） @example "a1b2c3d4-e5f6-7890-abcd-ef1234567890" */
@@ -7,7 +6,7 @@ export interface Banner {
   /** banner 名稱 @example "logo+文字" */
   title: string;
   /** banner 類型 @example "imgText" */
-  type: string;
+  type: BannerType;
   /** 圖片網址 @example "https://example.com/banner.jpg" */
   imgUrl: string;
   /** 圖片替代文字 @example "首頁 Banner" */
@@ -29,7 +28,7 @@ export interface PublicBanner{
   /** banner 名稱 @example "logo+文字" */
   title: string;
   /** banner 類型 @example "imgText" */
-  type: string;
+  type: BannerType;
   /** 圖片網址 @example "https://example.com/banner.jpg" */
   imgUrl: string;
   /** 圖片替代文字 @example "首頁 Banner" */

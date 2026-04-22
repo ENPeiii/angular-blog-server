@@ -10,21 +10,29 @@ model Post {
   id        String   @id @default(uuid())
   title     String
   content   String
-  author    String
+  categories String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  tags      Tag[]
 }
 
 model Tag {
-  id        String   @id @default(uuid())
+  id        String   @id
   name      String   @unique
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]
+}
+
+enum BannerType {
+  img
+  imgText
 }
 
 model Banner {
-  id        String   @id @default(uuid())
+  id        String     @id @default(uuid())
   title     String
-  type      String
+  type      BannerType
   imgUrl    String
   imgAlt    String
   isActive  Boolean  @default(false)

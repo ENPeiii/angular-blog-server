@@ -12,8 +12,8 @@
 				"properties": {
 					"id": {
 						"type": "string",
-						"description": "標籤唯一識別碼（UUID）",
-						"example": "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+						"description": "標籤 slug（前端當作路由使用）",
+						"example": "typescript"
 					},
 					"name": {
 						"type": "string",
@@ -57,6 +57,14 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"CategoriesType": {
+				"type": "string",
+				"enum": [
+					"common",
+					"topic"
+				],
+				"description": "文章類型(一般文章/主題文章)"
+			},
 			"PublicPost": {
 				"description": "前台公開文章物件（不含後台管理欄位）",
 				"properties": {
@@ -75,24 +83,32 @@
 						"description": "文章內文",
 						"example": "這是文章內容..."
 					},
-					"author": {
-						"type": "string",
-						"description": "作者名稱",
-						"example": "Alice"
+					"categories": {
+						"$ref": "#/components/schemas/CategoriesType",
+						"description": "文章類別",
+						"example": "common"
 					},
 					"createdAt": {
 						"type": "string",
 						"format": "date-time",
 						"description": "建立時間（UTC）",
 						"example": "2024-01-15T08:30:00.000Z"
+					},
+					"tags": {
+						"items": {
+							"$ref": "#/components/schemas/PublicTag"
+						},
+						"type": "array",
+						"description": "文章標籤列表"
 					}
 				},
 				"required": [
 					"id",
 					"title",
 					"content",
-					"author",
-					"createdAt"
+					"categories",
+					"createdAt",
+					"tags"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -126,6 +142,13 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"BannerType": {
+				"type": "string",
+				"enum": [
+					"img",
+					"imgText"
+				]
+			},
 			"PublicBanner": {
 				"description": "前台公開 banner 物件（不含後台管理欄位）",
 				"properties": {
@@ -140,7 +163,7 @@
 						"example": "logo+文字"
 					},
 					"type": {
-						"type": "string",
+						"$ref": "#/components/schemas/BannerType",
 						"description": "banner 類型",
 						"example": "imgText"
 					},
@@ -186,8 +209,8 @@
 				"properties": {
 					"id": {
 						"type": "string",
-						"description": "標籤唯一識別碼（UUID，由後端自動產生）",
-						"example": "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+						"description": "標籤id（前端當作路由使用）",
+						"example": "typescript"
 					},
 					"name": {
 						"type": "string",
@@ -199,12 +222,19 @@
 						"format": "date-time",
 						"description": "建立時間（UTC）",
 						"example": "2024-01-15T08:30:00.000Z"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "最後更新時間（UTC），未更新過則為 null",
+						"example": "2024-01-20T12:00:00.000Z"
 					}
 				},
 				"required": [
 					"id",
 					"name",
-					"createdAt"
+					"createdAt",
+					"updatedAt"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -286,10 +316,10 @@
 						"description": "文章內文（支援純文字或 Markdown）",
 						"example": "這是文章內容..."
 					},
-					"author": {
-						"type": "string",
-						"description": "作者名稱",
-						"example": "Alice"
+					"categories": {
+						"$ref": "#/components/schemas/CategoriesType",
+						"description": "文章類別",
+						"example": "common"
 					},
 					"createdAt": {
 						"type": "string",
@@ -300,17 +330,25 @@
 					"updatedAt": {
 						"type": "string",
 						"format": "date-time",
-						"description": "最後更新時間（UTC），未更新過則為 null",
+						"description": "最後更新時間（UTC）",
 						"example": "2024-01-20T12:00:00.000Z"
+					},
+					"tags": {
+						"items": {
+							"$ref": "#/components/schemas/PublicTag"
+						},
+						"type": "array",
+						"description": "文章標籤列表"
 					}
 				},
 				"required": [
 					"id",
 					"title",
 					"content",
-					"author",
+					"categories",
 					"createdAt",
-					"updatedAt"
+					"updatedAt",
+					"tags"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -357,16 +395,27 @@
 						"description": "文章內文（必填）",
 						"example": "這是文章內容..."
 					},
-					"author": {
-						"type": "string",
-						"description": "作者名稱（必填）",
-						"example": "Alice"
+					"categories": {
+						"$ref": "#/components/schemas/CategoriesType",
+						"description": "文章類別",
+						"example": "common"
+					},
+					"tags": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array",
+						"description": "標籤名稱清單，tag 不存在時自動建立",
+						"example": [
+							"TypeScript",
+							"Vue 3"
+						]
 					}
 				},
 				"required": [
 					"title",
 					"content",
-					"author"
+					"categories"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -384,12 +433,25 @@
 						"description": "新的文章內文",
 						"example": "更新後的內容..."
 					},
-					"author": {
-						"type": "string",
-						"description": "新的作者名稱",
-						"example": "Bob"
+					"categories": {
+						"$ref": "#/components/schemas/CategoriesType",
+						"description": "文章類別",
+						"example": "common"
+					},
+					"tags": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array",
+						"description": "傳入則完整替換文章的 tag 列表",
+						"example": [
+							"TypeScript"
+						]
 					}
 				},
+				"required": [
+					"categories"
+				],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -406,7 +468,7 @@
 						"example": "logo+文字"
 					},
 					"type": {
-						"type": "string",
+						"$ref": "#/components/schemas/BannerType",
 						"description": "banner 類型",
 						"example": "imgText"
 					},
@@ -484,13 +546,6 @@
 				],
 				"type": "object",
 				"additionalProperties": false
-			},
-			"BannerType": {
-				"type": "string",
-				"enum": [
-					"img",
-					"imgText"
-				]
 			},
 			"CreateBannerDto": {
 				"properties": {

@@ -108,7 +108,8 @@ angular-blog-server/
 │   │   └── auth.ts               ← 後台身份驗證，檢查 Authorization header
 │   │
 │   ├── lib/             ✏️ 你維護
-│   │   └── prisma.ts             ← Prisma Client 單例（避免 hot-reload 時連線數爆炸）
+│   │   ├── prisma.ts             ← Prisma Client 單例（避免 hot-reload 時連線數爆炸）
+│   │   └── slug.ts               ← toSlug() 共用工具：tag name → slug id（e.g. "Vue 3" → "vue-3"）
 │   ├── routes.ts        🤖 自動產生（npm run tsoa），不要手動修改
 │   ├── app.ts           ✏️ 你維護 — Express 設定：掛載 middleware、文件、路由
 │   └── server.ts        ✏️ 你維護 — 啟動伺服器（監聽 port）
@@ -174,8 +175,8 @@ angular-blog-server/
 | | 刪除 | — | DELETE `/api/admin/posts/:id` |
 | **Tags** | 取得全部 | GET `/api/public/tags` | GET `/api/admin/tags` |
 | | 取得單筆 | GET `/api/public/tags/:id` | GET `/api/admin/tags/:id` |
-| | 新增 | — | POST `/api/admin/tags` |
-| | 更新 | — | PUT `/api/admin/tags/:id` |
+| | 新增 | — (透過文章 API 自動建立) | POST `/api/admin/tags` |
+| | 更新（改名） | — | PUT `/api/admin/tags/:id` |
 | | 刪除 | — | DELETE `/api/admin/tags/:id` |
 | **Banner** | 取得啟用中 | GET `/api/public/banner` | — |
 | | 取得全部 | — | GET `/api/admin/banner` |
@@ -226,7 +227,7 @@ Express 的 middleware 按照掛載順序執行。
 1. 前端送出請求
    POST http://localhost:3000/api/admin/posts
    Headers: { Authorization: "Bearer my-token" }
-   Body: { "title": "My Post", "content": "...", "author": "Alice" }
+   Body: { "title": "My Post", "content": "...", "author": "Alice", "tags": ["TypeScript", "Vue 3"] }
 
 2. authMiddleware 攔截
    檢查 Authorization header 是否存在
@@ -244,12 +245,14 @@ Express 的 middleware 按照掛載順序執行。
    - 回傳結果
 
 5. Service 處理
-   - 呼叫 Prisma Client：`prisma.post.create({ data: dto })`
-   - Prisma 自動產生 UUID、createdAt、updatedAt
-   - PostgreSQL 寫入資料並回傳完整物件
+   - 對 tags 陣列中每個 name 呼叫 prisma.tag.upsert()（有就用、沒有就建）
+   - toSlug("Vue 3") → id "vue-3"，寫入或找到對應的 Tag 記錄
+   - prisma.post.create({ data: { ...postData, tags: { connect: [...] } } })
+   - Prisma 自動產生 UUID、createdAt、updatedAt，並建立 Post ↔ Tag 關聯記錄
+   - 回傳 Post（含 tags 陣列）
 
 6. 回應前端
-   { "id": 2, "title": "My Post", ... }
+   { "id": "a1b2...", "title": "My Post", ..., "tags": [{ "id": "typescript", "name": "TypeScript" }, ...] }
    HTTP 201 Created
 ```
 
@@ -269,6 +272,7 @@ export interface Post {
   author: string;
   createdAt: Date;
   updatedAt: Date;
+  tags: PublicTag[];   // 關聯的標籤（只含 id 和 name）
 }
 
 // 前台回傳用：不含 updatedAt（訪客不需要知道最後修改時間）
@@ -279,6 +283,7 @@ export interface PublicPost {
   content: string;
   author: string;
   createdAt: Date;
+  tags: PublicTag[];   // 前台也會看到標籤
 }
 
 // CreatePostDto 是「新增文章時，前端要送什麼」
@@ -288,6 +293,7 @@ export interface CreatePostDto {
   title: string;
   content: string;
   author: string;
+  tags?: string[];     // tag 名稱陣列，不存在的 tag 會自動建立
 }
 
 // UpdatePostDto 是「更新文章時，前端要送什麼」
@@ -296,6 +302,7 @@ export interface UpdatePostDto {
   title?: string;
   content?: string;
   author?: string;
+  tags?: string[];     // 傳入則完整替換該文章的 tag 列表，不傳則不動
 }
 ```
 
@@ -305,10 +312,10 @@ export interface UpdatePostDto {
 
 | interface | 用在哪 | 說明 |
 |-----------|--------|------|
-| `Post` | 後台 controller 回傳、Service 內部流通 | 完整資料，所有欄位都有 |
-| `PublicPost` | 前台 controller 回傳 | 精簡版，只有前台需要的欄位 |
-| `CreatePostDto` | 前端新增時送來 | 不含 id 和時間戳（後端自動產生） |
-| `UpdatePostDto` | 前端更新時送來 | 所有欄位都是選填 |
+| `Post` | 後台 controller 回傳、Service 內部流通 | 完整資料，所有欄位都有（含 tags） |
+| `PublicPost` | 前台 controller 回傳 | 精簡版，只有前台需要的欄位（含 tags，不含 updatedAt） |
+| `CreatePostDto` | 前端新增時送來 | 不含 id 和時間戳（後端自動產生）；tags 傳名稱陣列 |
+| `UpdatePostDto` | 前端更新時送來 | 所有欄位都是選填；tags 傳入則完整替換 |
 
 **為什麼 id 用 UUID（`string`）而不是流水號（`number`）？**
 
@@ -346,25 +353,43 @@ return publicPost; // 型別剛好符合 PublicPost
 所有 Service 現在都是 **Prisma（非同步）版本**，直接操作 PostgreSQL：
 
 ```typescript
+// 所有查詢都帶這個 include，讓 tags 跟著 post 一起回來
+const includeTags = {
+  include: { tags: { select: { id: true, name: true } } },
+} as const;
+
 export class PostsService {
-  // 所有方法都是 async，回傳 Promise
   async getAll(): Promise<Post[]> {
-    return prisma.post.findMany({ orderBy: { createdAt: "desc" } });
+    return prisma.post.findMany({ orderBy: { createdAt: "desc" }, ...includeTags });
   }
 
   async getById(id: string): Promise<Post | undefined> {
-    const post = await prisma.post.findUnique({ where: { id } });
+    const post = await prisma.post.findUnique({ where: { id }, ...includeTags });
     return post ?? undefined;
   }
 
   async create(dto: CreatePostDto): Promise<Post> {
-    return prisma.post.create({ data: dto });
-    // Prisma 自動處理：uuid() → id、now() → createdAt、@updatedAt → updatedAt
+    const { tags: tagNames = [], ...postData } = dto;
+    // tag 不存在就建立，已存在就取回 id（upsert）
+    const tagConnects = await upsertTags(tagNames);
+    return prisma.post.create({
+      data: { ...postData, tags: { connect: tagConnects } },
+      ...includeTags,
+    });
   }
 
   async update(id: string, dto: UpdatePostDto): Promise<Post | undefined> {
+    const { tags: tagNames, ...postData } = dto;
     try {
-      return await prisma.post.update({ where: { id }, data: dto });
+      // tags 有傳 → set（完整替換）；沒傳 → 不動
+      const tagsOp = tagNames !== undefined
+        ? { set: await upsertTags(tagNames) }
+        : undefined;
+      return await prisma.post.update({
+        where: { id },
+        data: { ...postData, ...(tagsOp ? { tags: tagsOp } : {}) },
+        ...includeTags,
+      });
     } catch {
       return undefined; // Prisma P2025：找不到 id 時 throw，統一回傳 undefined
     }
@@ -378,6 +403,17 @@ export class PostsService {
       return false;
     }
   }
+}
+
+// tag name → slug id，upsert 到 DB，回傳 { id } 供 connect/set 使用
+async function upsertTags(names: string[]): Promise<{ id: string }[]> {
+  return Promise.all(
+    names.map(async (name) => {
+      const id = toSlug(name); // "Vue 3" → "vue-3"
+      await prisma.tag.upsert({ where: { id }, create: { id, name }, update: {} });
+      return { id };
+    })
+  );
 }
 ```
 
@@ -676,8 +712,28 @@ model Post {
   author    String
   createdAt DateTime @default(now())        // 建立時間，INSERT 時自動填入
   updatedAt DateTime @updatedAt             // 更新時間，Prisma 每次 UPDATE 自動維護
+  tags      Tag[]                           // 多對多關聯，Prisma 自動建立 join table
+}
+
+model Tag {
+  id    String @id                          // slug，由 API 層的 toSlug() 產生，非 UUID
+  name  String @unique
+  posts Post[]                              // 多對多關聯（反向）
+  ...
 }
 ```
+
+**多對多關聯如何運作？**
+
+Prisma 看到 `Post.tags Tag[]` 和 `Tag.posts Post[]` 之後，會自動在資料庫建立一張隱式的 join table（`_PostToTag`），你完全不需要自己定義它：
+
+```
+Post ──── _PostToTag ──── Tag
+ id            postId          id
+              tagId
+```
+
+查詢時用 `include: { tags: true }` 就能一次拿到文章和它的所有標籤。
 
 Schema 是 **唯一的事實來源（Single Source of Truth）**：
 - 資料庫結構從這裡定義
@@ -730,6 +786,10 @@ CREATE TABLE "Post" (
 | `prisma.post.create({ data: dto })` | `INSERT INTO "Post" (...) VALUES (...)` |
 | `prisma.post.update({ where: { id }, data: dto })` | `UPDATE "Post" SET ... WHERE id = $1` |
 | `prisma.post.delete({ where: { id } })` | `DELETE FROM "Post" WHERE id = $1` |
+| `prisma.post.findMany({ include: { tags: true } })` | `SELECT` + JOIN `_PostToTag` + `Tag`（自動 join） |
+| `prisma.tag.upsert({ where: { id }, create: ..., update: {} })` | `INSERT ... ON CONFLICT DO NOTHING` |
+| `prisma.post.update({ data: { tags: { connect: [...] } } })` | `INSERT INTO "_PostToTag" ...` |
+| `prisma.post.update({ data: { tags: { set: [...] } } })` | 先刪除舊關聯，再建立新關聯 |
 
 開發時你可以在終端機看到每條實際執行的 SQL（`src/lib/prisma.ts` 的 `log: ["query"]` 設定）。
 
@@ -848,6 +908,9 @@ npm start
 1. **接資料庫** ← 已完成
    - PostgreSQL 跑在 Docker（port 5432），詳見 [DOCKER_POSTGRES.md](DOCKER_POSTGRES.md)
    - Prisma migration 已執行，`Post`、`Tag`、`Banner` 三張資料表已建立
+   - `Post` ↔ `Tag` 多對多關聯已建立（join table `_PostToTag` 由 Prisma 自動管理）
+   - Tag 的 `id` 由 API 層的 `toSlug()` 自動從 `name` 產生（e.g. `"Vue 3"` → `"vue-3"`）
+   - 寫文章時帶 `tags: string[]`，Service 自動 upsert tag 並建立關聯
    - 所有 Service 已全面換成 Prisma DB 版本
 
 2. **升級 Auth 為真正的 JWT 驗證** ← middleware 架構已建好

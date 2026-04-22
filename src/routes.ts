@@ -47,14 +47,20 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CategoriesType": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["common"]},{"dataType":"enum","enums":["topic"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PublicPost": {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"string","required":true},
             "title": {"dataType":"string","required":true},
             "content": {"dataType":"string","required":true},
-            "author": {"dataType":"string","required":true},
+            "categories": {"ref":"CategoriesType","required":true},
             "createdAt": {"dataType":"datetime","required":true},
+            "tags": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicTag"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -75,12 +81,17 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "BannerType": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["img"]},{"dataType":"enum","enums":["imgText"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PublicBanner": {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"string","required":true},
             "title": {"dataType":"string","required":true},
-            "type": {"dataType":"string","required":true},
+            "type": {"ref":"BannerType","required":true},
             "imgUrl": {"dataType":"string","required":true},
             "imgAlt": {"dataType":"string","required":true},
             "content": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
@@ -102,6 +113,7 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"string","required":true},
             "name": {"dataType":"string","required":true},
             "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
         },
         "additionalProperties": false,
     },
@@ -144,9 +156,10 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"string","required":true},
             "title": {"dataType":"string","required":true},
             "content": {"dataType":"string","required":true},
-            "author": {"dataType":"string","required":true},
+            "categories": {"ref":"CategoriesType","required":true},
             "createdAt": {"dataType":"datetime","required":true},
             "updatedAt": {"dataType":"datetime","required":true},
+            "tags": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicTag"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -172,7 +185,8 @@ const models: TsoaRoute.Models = {
         "properties": {
             "title": {"dataType":"string","required":true},
             "content": {"dataType":"string","required":true},
-            "author": {"dataType":"string","required":true},
+            "categories": {"ref":"CategoriesType","required":true},
+            "tags": {"dataType":"array","array":{"dataType":"string"}},
         },
         "additionalProperties": false,
     },
@@ -182,7 +196,8 @@ const models: TsoaRoute.Models = {
         "properties": {
             "title": {"dataType":"string"},
             "content": {"dataType":"string"},
-            "author": {"dataType":"string"},
+            "categories": {"ref":"CategoriesType","required":true},
+            "tags": {"dataType":"array","array":{"dataType":"string"}},
         },
         "additionalProperties": false,
     },
@@ -192,7 +207,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "id": {"dataType":"string","required":true},
             "title": {"dataType":"string","required":true},
-            "type": {"dataType":"string","required":true},
+            "type": {"ref":"BannerType","required":true},
             "imgUrl": {"dataType":"string","required":true},
             "imgAlt": {"dataType":"string","required":true},
             "isActive": {"dataType":"boolean","required":true},
@@ -217,11 +232,6 @@ const models: TsoaRoute.Models = {
             "data": {"ref":"BannerModel","required":true},
         },
         "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "BannerType": {
-        "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["img"]},{"dataType":"enum","enums":["imgText"]}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateBannerDto": {
