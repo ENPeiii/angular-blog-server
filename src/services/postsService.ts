@@ -1,12 +1,12 @@
+import { CategoriesType } from "@prisma/client";
 import { toSlug } from "../lib/slug";
-import { CreatePostDto, Post, UpdatePostDto } from "../models/post";
+import { CreatePostDto, Post, PostLatestItem, PostListItem, UpdatePostDto } from "../models/post";
 import { prisma } from "../lib/prisma";
 
-const includeTags = {
+const includeRelations = {
   include: {
-    tags: {
-      select: { id: true, name: true },
-    },
+    tags: { select: { id: true, name: true } },
+    topic: { select: { id: true, name: true, description: true } },
   },
 } as const;
 
@@ -14,14 +14,14 @@ export class PostsService {
   async getAll(): Promise<Post[]> {
     return prisma.post.findMany({
       orderBy: { createdAt: "desc" },
-      ...includeTags,
+      ...includeRelations,
     });
   }
 
   async getById(id: string): Promise<Post | undefined> {
     const post = await prisma.post.findUnique({
       where: { id },
-      ...includeTags,
+      ...includeRelations,
     });
     return post ?? undefined;
   }
@@ -35,7 +35,7 @@ export class PostsService {
         ...postData,
         tags: { connect: tagConnects },
       },
-      ...includeTags,
+      ...includeRelations,
     });
   }
 
@@ -54,11 +54,47 @@ export class PostsService {
           ...postData,
           ...(tagsOperation ? { tags: tagsOperation } : {}),
         },
-        ...includeTags,
+        ...includeRelations,
       });
     } catch {
       return undefined;
     }
+  }
+
+  async getList(categories?: string, topicId?: string): Promise<PostListItem[]> {
+    const validCategories = Object.values(CategoriesType);
+    const categoriesFilter =
+      categories && validCategories.includes(categories as CategoriesType)
+        ? { categories: categories as CategoriesType }
+        : {};
+
+    return prisma.post.findMany({
+      where: {
+        ...categoriesFilter,
+        ...(topicId ? { topicId } : {}),
+      },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, title: true, categories: true, topicId: true, createdAt: true },
+    });
+  }
+
+  async getLatest(): Promise<PostLatestItem[]> {
+    const posts = await prisma.post.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      select: {
+        id: true,
+        title: true,
+        categories: true,
+        content: true,
+        createdAt: true,
+        tags: { select: { id: true, name: true } },
+      },
+    });
+    return posts.map(post => ({
+      ...post,
+      content: post.content.slice(0, 100),
+    }));
   }
 
   async delete(id: string): Promise<boolean> {

@@ -7,6 +7,63 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"PublicTopic": {
+				"description": "前台公開主題物件",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "主題 slug",
+						"example": "vue-series"
+					},
+					"name": {
+						"type": "string",
+						"description": "主題名稱",
+						"example": "Vue 系列"
+					},
+					"description": {
+						"type": "string",
+						"nullable": true,
+						"description": "主題簡介",
+						"example": "從零開始學 Vue 3"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"description"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_PublicTopic-Array_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/PublicTopic"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_PublicTopic_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/PublicTopic"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"PublicTag": {
 				"description": "前台公開標籤物件（不含後台管理欄位）",
 				"properties": {
@@ -57,16 +114,139 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"CategoriesType": {
+			"_36_Enums.CategoriesType": {
 				"type": "string",
 				"enum": [
-					"common",
-					"topic"
+					"tech",
+					"life"
+				]
+			},
+			"CategoriesType": {
+				"$ref": "#/components/schemas/_36_Enums.CategoriesType"
+			},
+			"PostListItem": {
+				"description": "文章列表項目（分類頁 / 主題頁用，不含 content 和 tags）",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "文章唯一識別碼",
+						"example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+					},
+					"title": {
+						"type": "string",
+						"description": "文章標題",
+						"example": "我的第一篇文章"
+					},
+					"categories": {
+						"$ref": "#/components/schemas/CategoriesType",
+						"description": "文章分類",
+						"example": "tech"
+					},
+					"topicId": {
+						"type": "string",
+						"nullable": true,
+						"description": "所屬主題 ID",
+						"example": "vue-series"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "建立時間（UTC）",
+						"example": "2024-01-15T08:30:00.000Z"
+					}
+				},
+				"required": [
+					"id",
+					"title",
+					"categories",
+					"topicId",
+					"createdAt"
 				],
-				"description": "文章類型(一般文章/主題文章)"
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_PostListItem-Array_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/PostListItem"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PostLatestItem": {
+				"description": "首頁最新文章項目（含 tags 和截斷的 content）",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "文章唯一識別碼",
+						"example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+					},
+					"title": {
+						"type": "string",
+						"description": "文章標題",
+						"example": "我的第一篇文章"
+					},
+					"categories": {
+						"$ref": "#/components/schemas/CategoriesType",
+						"description": "文章分類",
+						"example": "tech"
+					},
+					"content": {
+						"type": "string",
+						"description": "文章內文前 100 字",
+						"example": "這是文章內容的前一百個字..."
+					},
+					"tags": {
+						"items": {
+							"$ref": "#/components/schemas/PublicTag"
+						},
+						"type": "array",
+						"description": "文章標籤列表"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "建立時間（UTC）",
+						"example": "2024-01-15T08:30:00.000Z"
+					}
+				},
+				"required": [
+					"id",
+					"title",
+					"categories",
+					"content",
+					"tags",
+					"createdAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_PostLatestItem-Array_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/PostLatestItem"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
 			},
 			"PublicPost": {
-				"description": "前台公開文章物件（不含後台管理欄位）",
+				"description": "前台公開文章物件（不含 updatedAt）",
 				"properties": {
 					"id": {
 						"type": "string",
@@ -80,13 +260,28 @@
 					},
 					"content": {
 						"type": "string",
-						"description": "文章內文",
-						"example": "這是文章內容..."
+						"description": "文章內文（Markdown）",
+						"example": "# Hello"
 					},
 					"categories": {
 						"$ref": "#/components/schemas/CategoriesType",
-						"description": "文章類別",
-						"example": "common"
+						"description": "文章分類",
+						"example": "tech"
+					},
+					"topicId": {
+						"type": "string",
+						"nullable": true,
+						"description": "所屬主題 ID",
+						"example": "vue-series"
+					},
+					"topic": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/PublicTopic"
+							}
+						],
+						"nullable": true,
+						"description": "所屬主題"
 					},
 					"createdAt": {
 						"type": "string",
@@ -107,24 +302,10 @@
 					"title",
 					"content",
 					"categories",
+					"topicId",
+					"topic",
 					"createdAt",
 					"tags"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"ApiResponse_PublicPost-Array_": {
-				"description": "統一 API 回傳格式",
-				"properties": {
-					"data": {
-						"items": {
-							"$ref": "#/components/schemas/PublicPost"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"data"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -142,12 +323,15 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"BannerType": {
+			"_36_Enums.BannerType": {
 				"type": "string",
 				"enum": [
 					"img",
 					"imgText"
 				]
+			},
+			"BannerType": {
+				"$ref": "#/components/schemas/_36_Enums.BannerType"
 			},
 			"PublicBanner": {
 				"description": "前台公開 banner 物件（不含後台管理欄位）",
@@ -199,6 +383,114 @@
 				"properties": {
 					"data": {
 						"$ref": "#/components/schemas/PublicBanner"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Topic": {
+				"description": "後台完整主題物件",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "主題 slug",
+						"example": "vue-series"
+					},
+					"name": {
+						"type": "string",
+						"description": "主題名稱",
+						"example": "Vue 系列"
+					},
+					"description": {
+						"type": "string",
+						"nullable": true,
+						"description": "主題簡介",
+						"example": "從零開始學 Vue 3"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "建立時間（UTC）",
+						"example": "2024-01-15T08:30:00.000Z"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "最後更新時間（UTC）",
+						"example": "2024-01-20T12:00:00.000Z"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"description",
+					"createdAt",
+					"updatedAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_Topic-Array_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/Topic"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_Topic_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/Topic"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateTopicDto": {
+				"description": "新增主題時的請求資料",
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "主題名稱（必填）",
+						"example": "Vue 系列"
+					},
+					"description": {
+						"type": "string",
+						"description": "主題簡介",
+						"example": "從零開始學 Vue 3"
+					}
+				},
+				"required": [
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateTopicDto": {
+				"description": "更新主題時的請求資料",
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "主題名稱",
+						"example": "Vue 系列"
+					},
+					"description": {
+						"type": "string",
+						"description": "主題簡介",
+						"example": "從零開始學 Vue 3"
 					}
 				},
 				"type": "object",
@@ -299,11 +591,11 @@
 				"additionalProperties": false
 			},
 			"PostModel": {
-				"description": "後台完整文章物件（從資料庫/記憶體讀出來的完整資料）",
+				"description": "後台完整文章物件",
 				"properties": {
 					"id": {
 						"type": "string",
-						"description": "文章唯一識別碼（UUID，由後端自動產生）",
+						"description": "文章唯一識別碼（UUID）",
 						"example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 					},
 					"title": {
@@ -313,13 +605,28 @@
 					},
 					"content": {
 						"type": "string",
-						"description": "文章內文（支援純文字或 Markdown）",
-						"example": "這是文章內容..."
+						"description": "文章內文（Markdown）",
+						"example": "# Hello"
 					},
 					"categories": {
 						"$ref": "#/components/schemas/CategoriesType",
-						"description": "文章類別",
-						"example": "common"
+						"description": "文章分類",
+						"example": "tech"
+					},
+					"topicId": {
+						"type": "string",
+						"nullable": true,
+						"description": "所屬主題 ID",
+						"example": "vue-series"
+					},
+					"topic": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/PublicTopic"
+							}
+						],
+						"nullable": true,
+						"description": "所屬主題"
 					},
 					"createdAt": {
 						"type": "string",
@@ -346,6 +653,8 @@
 					"title",
 					"content",
 					"categories",
+					"topicId",
+					"topic",
 					"createdAt",
 					"updatedAt",
 					"tags"
@@ -383,7 +692,7 @@
 				"additionalProperties": false
 			},
 			"CreatePostDto": {
-				"description": "新增文章時的請求資料（id 和時間戳由後端自動產生）",
+				"description": "新增文章時的請求資料",
 				"properties": {
 					"title": {
 						"type": "string",
@@ -393,12 +702,17 @@
 					"content": {
 						"type": "string",
 						"description": "文章內文（必填）",
-						"example": "這是文章內容..."
+						"example": "# Hello"
 					},
 					"categories": {
 						"$ref": "#/components/schemas/CategoriesType",
-						"description": "文章類別",
-						"example": "common"
+						"description": "文章分類（必填）",
+						"example": "tech"
+					},
+					"topicId": {
+						"type": "string",
+						"description": "所屬主題 ID",
+						"example": "vue-series"
 					},
 					"tags": {
 						"items": {
@@ -421,7 +735,7 @@
 				"additionalProperties": false
 			},
 			"UpdatePostDto": {
-				"description": "更新文章時的請求資料（所有欄位皆為選填，只傳要改的欄位即可）",
+				"description": "更新文章時的請求資料（所有欄位皆為選填）",
 				"properties": {
 					"title": {
 						"type": "string",
@@ -431,12 +745,18 @@
 					"content": {
 						"type": "string",
 						"description": "新的文章內文",
-						"example": "更新後的內容..."
+						"example": "# Updated"
 					},
 					"categories": {
 						"$ref": "#/components/schemas/CategoriesType",
-						"description": "文章類別",
-						"example": "common"
+						"description": "文章分類",
+						"example": "life"
+					},
+					"topicId": {
+						"type": "string",
+						"nullable": true,
+						"description": "所屬主題 ID（傳 null 可解除關聯）",
+						"example": "vue-series"
 					},
 					"tags": {
 						"items": {
@@ -449,9 +769,6 @@
 						]
 					}
 				},
-				"required": [
-					"categories"
-				],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -624,6 +941,80 @@
 		"contact": {}
 	},
 	"paths": {
+		"/public/topics": {
+			"get": {
+				"operationId": "GetTopics",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_PublicTopic-Array_"
+								}
+							}
+						}
+					}
+				},
+				"description": "取得所有主題列表（含簡介）",
+				"tags": [
+					"Public - Topics"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/public/topics/{id}": {
+			"get": {
+				"operationId": "GetTopic",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_PublicTopic_"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Topic not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "根據 ID 取得單一主題",
+				"tags": [
+					"Public - Topics"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "主題 slug",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
 		"/public/tags": {
 			"get": {
 				"operationId": "GetTags",
@@ -707,13 +1098,55 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_PublicPost-Array_"
+									"$ref": "#/components/schemas/ApiResponse_PostListItem-Array_"
 								}
 							}
 						}
 					}
 				},
-				"description": "取得所有文章清單",
+				"description": "取得文章列表（不含內文與標籤），可依分類或主題篩選",
+				"tags": [
+					"Public - Posts"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "文章分類（tech | life），不傳則取全部",
+						"in": "query",
+						"name": "categories",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "主題 slug，不傳則取全部",
+						"in": "query",
+						"name": "topicId",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/public/posts/latest": {
+			"get": {
+				"operationId": "GetLatestPosts",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_PostLatestItem-Array_"
+								}
+							}
+						}
+					}
+				},
+				"description": "取得首頁最新 5 篇文章（含標籤、內文前 100 字）",
 				"tags": [
 					"Public - Posts"
 				],
@@ -754,7 +1187,7 @@
 						}
 					}
 				},
-				"description": "根據 ID 取得單篇文章",
+				"description": "根據 ID 取得單篇文章完整內容",
 				"tags": [
 					"Public - Posts"
 				],
@@ -793,6 +1226,212 @@
 				],
 				"security": [],
 				"parameters": []
+			}
+		},
+		"/admin/topics": {
+			"get": {
+				"operationId": "GetTopics",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Topic-Array_"
+								}
+							}
+						}
+					}
+				},
+				"description": "取得所有主題清單",
+				"tags": [
+					"Admin - Topics"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateTopic",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Topic_"
+								}
+							}
+						}
+					}
+				},
+				"description": "新增一個主題（id 由 name 自動產生 slug）",
+				"tags": [
+					"Admin - Topics"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateTopicDto"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/topics/{id}": {
+			"get": {
+				"operationId": "GetTopic",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Topic_"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Topic not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "根據 ID 取得單一主題",
+				"tags": [
+					"Admin - Topics"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "主題 slug",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateTopic",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_Topic_"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Topic not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "更新指定主題",
+				"tags": [
+					"Admin - Topics"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "主題 slug",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateTopicDto"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteTopic",
+				"responses": {
+					"204": {
+						"description": "Deleted"
+					},
+					"404": {
+						"description": "Topic not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "刪除指定主題",
+				"tags": [
+					"Admin - Topics"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "主題 slug",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/admin/tags": {

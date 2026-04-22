@@ -1,5 +1,5 @@
-import { Controller, Get, Path, Route, Tags, Response } from "tsoa";
-import { PublicPost } from "../../models/post";
+import { Controller, Get, Path, Query, Route, Tags, Response } from "tsoa";
+import { PostLatestItem, PostListItem, PublicPost } from "../../models/post";
 import { PostsService } from "../../services/postsService";
 import { ApiResponse } from "../../models/response";
 
@@ -9,16 +9,28 @@ export class PublicPostsController extends Controller {
   private postsService = new PostsService();
 
   /**
-   * 取得所有文章清單
+   * 取得文章列表（不含內文與標籤），可依分類或主題篩選
+   * @param categories 文章分類（tech | life），不傳則取全部
+   * @param topicId 主題 slug，不傳則取全部
    */
   @Get("/")
-  public async getPosts(): Promise<ApiResponse<PublicPost[]>> {
-    const posts = await this.postsService.getAll();
-    return { data: posts.map(({ updatedAt, ...post }) => post) };
+  public async getPosts(
+    @Query() categories?: string,
+    @Query() topicId?: string
+  ): Promise<ApiResponse<PostListItem[]>> {
+    return { data: await this.postsService.getList(categories, topicId) };
   }
 
   /**
-   * 根據 ID 取得單篇文章
+   * 取得首頁最新 5 篇文章（含標籤、內文前 100 字）
+   */
+  @Get("latest")
+  public async getLatestPosts(): Promise<ApiResponse<PostLatestItem[]>> {
+    return { data: await this.postsService.getLatest() };
+  }
+
+  /**
+   * 根據 ID 取得單篇文章完整內容
    * @param id 文章 ID
    */
   @Get("{id}")

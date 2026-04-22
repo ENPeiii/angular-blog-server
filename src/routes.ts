@@ -4,11 +4,15 @@
 import type { TsoaRoute } from '@tsoa/runtime';
 import {  fetchMiddlewares, ExpressTemplateService } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { PublicTopicsController } from './controllers/public/topicsController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { PublicTagsController } from './controllers/public/tagsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { PublicPostsController } from './controllers/public/postsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { PublicBannerController } from './controllers/public/bannerController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { AdminTopicsController } from './controllers/admin/topicsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { AdminTagsController } from './controllers/admin/tagsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -22,6 +26,32 @@ import type { Request as ExRequest, Response as ExResponse, RequestHandler, Rout
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
+    "PublicTopic": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string","required":true},
+            "name": {"dataType":"string","required":true},
+            "description": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_PublicTopic-Array_": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicTopic"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_PublicTopic_": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"ref":"PublicTopic","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PublicTag": {
         "dataType": "refObject",
         "properties": {
@@ -47,9 +77,55 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "_36_Enums.CategoriesType": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["tech"]},{"dataType":"enum","enums":["life"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CategoriesType": {
         "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["common"]},{"dataType":"enum","enums":["topic"]}],"validators":{}},
+        "type": {"ref":"_36_Enums.CategoriesType","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PostListItem": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string","required":true},
+            "title": {"dataType":"string","required":true},
+            "categories": {"ref":"CategoriesType","required":true},
+            "topicId": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
+            "createdAt": {"dataType":"datetime","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_PostListItem-Array_": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"PostListItem"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PostLatestItem": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string","required":true},
+            "title": {"dataType":"string","required":true},
+            "categories": {"ref":"CategoriesType","required":true},
+            "content": {"dataType":"string","required":true},
+            "tags": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicTag"},"required":true},
+            "createdAt": {"dataType":"datetime","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_PostLatestItem-Array_": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"PostLatestItem"},"required":true},
+        },
+        "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PublicPost": {
@@ -59,16 +135,10 @@ const models: TsoaRoute.Models = {
             "title": {"dataType":"string","required":true},
             "content": {"dataType":"string","required":true},
             "categories": {"ref":"CategoriesType","required":true},
+            "topicId": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
+            "topic": {"dataType":"union","subSchemas":[{"ref":"PublicTopic"},{"dataType":"enum","enums":[null]}],"required":true},
             "createdAt": {"dataType":"datetime","required":true},
             "tags": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicTag"},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ApiResponse_PublicPost-Array_": {
-        "dataType": "refObject",
-        "properties": {
-            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicPost"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -81,9 +151,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "BannerType": {
+    "_36_Enums.BannerType": {
         "dataType": "refAlias",
         "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["img"]},{"dataType":"enum","enums":["imgText"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "BannerType": {
+        "dataType": "refAlias",
+        "type": {"ref":"_36_Enums.BannerType","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PublicBanner": {
@@ -103,6 +178,52 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"union","subSchemas":[{"ref":"PublicBanner"},{"dataType":"undefined"}],"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Topic": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string","required":true},
+            "name": {"dataType":"string","required":true},
+            "description": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
+            "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_Topic-Array_": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"Topic"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_Topic_": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"ref":"Topic","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CreateTopicDto": {
+        "dataType": "refObject",
+        "properties": {
+            "name": {"dataType":"string","required":true},
+            "description": {"dataType":"string"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UpdateTopicDto": {
+        "dataType": "refObject",
+        "properties": {
+            "name": {"dataType":"string"},
+            "description": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
@@ -157,6 +278,8 @@ const models: TsoaRoute.Models = {
             "title": {"dataType":"string","required":true},
             "content": {"dataType":"string","required":true},
             "categories": {"ref":"CategoriesType","required":true},
+            "topicId": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
+            "topic": {"dataType":"union","subSchemas":[{"ref":"PublicTopic"},{"dataType":"enum","enums":[null]}],"required":true},
             "createdAt": {"dataType":"datetime","required":true},
             "updatedAt": {"dataType":"datetime","required":true},
             "tags": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicTag"},"required":true},
@@ -186,6 +309,7 @@ const models: TsoaRoute.Models = {
             "title": {"dataType":"string","required":true},
             "content": {"dataType":"string","required":true},
             "categories": {"ref":"CategoriesType","required":true},
+            "topicId": {"dataType":"string"},
             "tags": {"dataType":"array","array":{"dataType":"string"}},
         },
         "additionalProperties": false,
@@ -196,7 +320,8 @@ const models: TsoaRoute.Models = {
         "properties": {
             "title": {"dataType":"string"},
             "content": {"dataType":"string"},
-            "categories": {"ref":"CategoriesType","required":true},
+            "categories": {"ref":"CategoriesType"},
+            "topicId": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}]},
             "tags": {"dataType":"array","array":{"dataType":"string"}},
         },
         "additionalProperties": false,
@@ -275,6 +400,65 @@ export function RegisterRoutes(app: Router) {
 
 
     
+        const argsPublicTopicsController_getTopics: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/public/topics',
+            ...(fetchMiddlewares<RequestHandler>(PublicTopicsController)),
+            ...(fetchMiddlewares<RequestHandler>(PublicTopicsController.prototype.getTopics)),
+
+            async function PublicTopicsController_getTopics(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPublicTopicsController_getTopics, request, response });
+
+                const controller = new PublicTopicsController();
+
+              await templateService.apiHandler({
+                methodName: 'getTopics',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsPublicTopicsController_getTopic: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
+        };
+        app.get('/public/topics/:id',
+            ...(fetchMiddlewares<RequestHandler>(PublicTopicsController)),
+            ...(fetchMiddlewares<RequestHandler>(PublicTopicsController.prototype.getTopic)),
+
+            async function PublicTopicsController_getTopic(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPublicTopicsController_getTopic, request, response });
+
+                const controller = new PublicTopicsController();
+
+              await templateService.apiHandler({
+                methodName: 'getTopic',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsPublicTagsController_getTags: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/public/tags',
@@ -335,6 +519,8 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsPublicPostsController_getPosts: Record<string, TsoaRoute.ParameterSchema> = {
+                categories: {"in":"query","name":"categories","dataType":"string"},
+                topicId: {"in":"query","name":"topicId","dataType":"string"},
         };
         app.get('/public/posts',
             ...(fetchMiddlewares<RequestHandler>(PublicPostsController)),
@@ -352,6 +538,35 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'getPosts',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsPublicPostsController_getLatestPosts: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/public/posts/latest',
+            ...(fetchMiddlewares<RequestHandler>(PublicPostsController)),
+            ...(fetchMiddlewares<RequestHandler>(PublicPostsController.prototype.getLatestPosts)),
+
+            async function PublicPostsController_getLatestPosts(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPublicPostsController_getLatestPosts, request, response });
+
+                const controller = new PublicPostsController();
+
+              await templateService.apiHandler({
+                methodName: 'getLatestPosts',
                 controller,
                 response,
                 next,
@@ -416,6 +631,156 @@ export function RegisterRoutes(app: Router) {
                 next,
                 validatedArgs,
                 successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminTopicsController_getTopics: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/admin/topics',
+            ...(fetchMiddlewares<RequestHandler>(AdminTopicsController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminTopicsController.prototype.getTopics)),
+
+            async function AdminTopicsController_getTopics(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminTopicsController_getTopics, request, response });
+
+                const controller = new AdminTopicsController();
+
+              await templateService.apiHandler({
+                methodName: 'getTopics',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminTopicsController_getTopic: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
+        };
+        app.get('/admin/topics/:id',
+            ...(fetchMiddlewares<RequestHandler>(AdminTopicsController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminTopicsController.prototype.getTopic)),
+
+            async function AdminTopicsController_getTopic(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminTopicsController_getTopic, request, response });
+
+                const controller = new AdminTopicsController();
+
+              await templateService.apiHandler({
+                methodName: 'getTopic',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminTopicsController_createTopic: Record<string, TsoaRoute.ParameterSchema> = {
+                body: {"in":"body","name":"body","required":true,"ref":"CreateTopicDto"},
+        };
+        app.post('/admin/topics',
+            ...(fetchMiddlewares<RequestHandler>(AdminTopicsController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminTopicsController.prototype.createTopic)),
+
+            async function AdminTopicsController_createTopic(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminTopicsController_createTopic, request, response });
+
+                const controller = new AdminTopicsController();
+
+              await templateService.apiHandler({
+                methodName: 'createTopic',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminTopicsController_updateTopic: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
+                body: {"in":"body","name":"body","required":true,"ref":"UpdateTopicDto"},
+        };
+        app.put('/admin/topics/:id',
+            ...(fetchMiddlewares<RequestHandler>(AdminTopicsController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminTopicsController.prototype.updateTopic)),
+
+            async function AdminTopicsController_updateTopic(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminTopicsController_updateTopic, request, response });
+
+                const controller = new AdminTopicsController();
+
+              await templateService.apiHandler({
+                methodName: 'updateTopic',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminTopicsController_deleteTopic: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
+        };
+        app.delete('/admin/topics/:id',
+            ...(fetchMiddlewares<RequestHandler>(AdminTopicsController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminTopicsController.prototype.deleteTopic)),
+
+            async function AdminTopicsController_deleteTopic(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminTopicsController_deleteTopic, request, response });
+
+                const controller = new AdminTopicsController();
+
+              await templateService.apiHandler({
+                methodName: 'deleteTopic',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 204,
               });
             } catch (err) {
                 return next(err);

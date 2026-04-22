@@ -6,14 +6,30 @@ datasource db {
   provider = "postgresql"
 }
 
+enum CategoriesType {
+  tech
+  life
+}
+
+model Topic {
+  id          String   @id
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  posts       Post[]
+}
+
 model Post {
-  id        String   @id @default(uuid())
-  title     String
-  content   String
-  categories String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  tags      Tag[]
+  id         String         @id @default(uuid())
+  title      String
+  content    String
+  categories CategoriesType
+  topicId    String?
+  topic      Topic?         @relation(fields: [topicId], references: [id])
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  tags       Tag[]
 }
 
 model Tag {

@@ -84,24 +84,28 @@ angular-blog-server/
 │
 ├── src/
 │   ├── models/          ✏️ 你維護
-│   │   ├── post.ts               ← Post 的 interface（Post、PublicPost、CreatePostDto、UpdatePostDto）
+│   │   ├── post.ts               ← Post 的 interface（Post、PublicPost、PostListItem、PostLatestItem、CreatePostDto、UpdatePostDto）
 │   │   ├── tag.ts                ← Tag 的 interface（Tag、PublicTag、CreateTagDto、UpdateTagDto）
+│   │   ├── topic.ts              ← Topic 的 interface（Topic、PublicTopic、CreateTopicDto、UpdateTopicDto）
 │   │   ├── banner.ts             ← Banner 的 interface（Banner、PublicBanner、CreateBannerDto、UpdateBannerDto）
 │   │   └── response.ts           ← 統一 API 回傳格式 ApiResponse<T>
 │   │
 │   ├── services/        ✏️ 你維護
 │   │   ├── postsService.ts       ← Post CRUD（Prisma / PostgreSQL）
 │   │   ├── tagsService.ts        ← Tag CRUD（Prisma / PostgreSQL）
+│   │   ├── topicsService.ts      ← Topic CRUD（Prisma / PostgreSQL）
 │   │   └── bannerService.ts      ← Banner CRUD（Prisma / PostgreSQL）
 │   │
 │   ├── controllers/     ✏️ 你維護
 │   │   ├── public/               ← 前台：只有讀取，不需要登入
 │   │   │   ├── postsController.ts   (@Route("public/posts"))
 │   │   │   ├── tagsController.ts    (@Route("public/tags"))
+│   │   │   ├── topicsController.ts  (@Route("public/topics"))
 │   │   │   └── bannerController.ts  (@Route("public/banner"))
 │   │   └── admin/                ← 後台：完整 CRUD，需要 Authorization header
 │   │       ├── postsController.ts   (@Route("admin/posts"))
 │   │       ├── tagsController.ts    (@Route("admin/tags"))
+│   │       ├── topicsController.ts  (@Route("admin/topics"))
 │   │       └── bannerController.ts  (@Route("admin/banner"))
 │   │
 │   ├── middleware/      ✏️ 你維護
@@ -168,11 +172,17 @@ angular-blog-server/
 
 | 資源 | 動作 | 前台（公開） | 後台（需登入） |
 |------|------|------------|--------------|
-| **Posts** | 取得全部 | GET `/api/public/posts` | GET `/api/admin/posts` |
-| | 取得單筆 | GET `/api/public/posts/:id` | GET `/api/admin/posts/:id` |
+| **Posts** | 文章列表（可篩選分類/主題） | GET `/api/public/posts?categories=tech&topicId=vue-series` | GET `/api/admin/posts` |
+| | 首頁最新 5 篇（含 tags、100 字內文） | GET `/api/public/posts/latest` | — |
+| | 取得單篇完整內容 | GET `/api/public/posts/:id` | GET `/api/admin/posts/:id` |
 | | 新增 | — | POST `/api/admin/posts` |
 | | 更新 | — | PUT `/api/admin/posts/:id` |
 | | 刪除 | — | DELETE `/api/admin/posts/:id` |
+| **Topics** | 取得全部 | GET `/api/public/topics` | GET `/api/admin/topics` |
+| | 取得單筆 | GET `/api/public/topics/:id` | GET `/api/admin/topics/:id` |
+| | 新增 | — | POST `/api/admin/topics` |
+| | 更新 | — | PUT `/api/admin/topics/:id` |
+| | 刪除 | — | DELETE `/api/admin/topics/:id` |
 | **Tags** | 取得全部 | GET `/api/public/tags` | GET `/api/admin/tags` |
 | | 取得單筆 | GET `/api/public/tags/:id` | GET `/api/admin/tags/:id` |
 | | 新增 | — (透過文章 API 自動建立) | POST `/api/admin/tags` |
@@ -907,10 +917,14 @@ npm start
 
 1. **接資料庫** ← 已完成
    - PostgreSQL 跑在 Docker（port 5432），詳見 [DOCKER_POSTGRES.md](DOCKER_POSTGRES.md)
-   - Prisma migration 已執行，`Post`、`Tag`、`Banner` 三張資料表已建立
-   - `Post` ↔ `Tag` 多對多關聯已建立（join table `_PostToTag` 由 Prisma 自動管理）
-   - Tag 的 `id` 由 API 層的 `toSlug()` 自動從 `name` 產生（e.g. `"Vue 3"` → `"vue-3"`）
+   - Prisma migration 已執行，`Post`、`Tag`、`Topic`、`Banner` 四張資料表已建立
+   - `Post` ↔ `Tag` 多對多關聯（join table `_PostToTag`）
+   - `Topic` → `Post` 一對多關聯（`Post.topicId` 為外鍵，nullable）
+   - `Post.categories` 為 Prisma enum（`tech | life`），`Banner.type` 為 Prisma enum（`img | imgText`）
+   - Tag / Topic 的 `id` 由 API 層 `toSlug()` 從 `name` 自動產生（e.g. `"Vue 3"` → `"vue-3"`）
    - 寫文章時帶 `tags: string[]`，Service 自動 upsert tag 並建立關聯
+   - 前台文章列表支援 `?categories=tech` 和 `?topicId=vue-series` 篩選
+   - 前台 `/posts/latest` 回傳最新 5 篇（含 tags、內文前 100 字）
    - 所有 Service 已全面換成 Prisma DB 版本
 
 2. **升級 Auth 為真正的 JWT 驗證** ← middleware 架構已建好
