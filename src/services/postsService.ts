@@ -1,6 +1,6 @@
-import { CategoriesType } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { toSlug } from "../lib/slug";
-import { CreatePostDto, Post, PostLatestItem, PostListItem, UpdatePostDto } from "../models/post";
+import { CategoriesType, CreatePostDto, Post, PostLatestItem, PostListItem, UpdatePostDto } from "../models/post";
 import { prisma } from "../lib/prisma";
 
 const includeRelations = {
@@ -11,11 +11,17 @@ const includeRelations = {
 } as const;
 
 export class PostsService {
-  async getAll(): Promise<Post[]> {
-    return prisma.post.findMany({
-      orderBy: { createdAt: "desc" },
-      ...includeRelations,
-    });
+  async getAll(page: number, pageSize: number): Promise<{ data: Post[]; total: number }> {
+    const [data, total] = await prisma.$transaction([
+      prisma.post.findMany({
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        ...includeRelations,
+      }),
+      prisma.post.count(),
+    ]);
+    return { data, total };
   }
 
   async getById(id: string): Promise<Post | undefined> {
@@ -30,17 +36,29 @@ export class PostsService {
     const { tags: tagNames = [], ...postData } = dto;
     const tagConnects = await upsertTags(tagNames);
 
-    return prisma.post.create({
-      data: {
-        ...postData,
-        tags: { connect: tagConnects },
-      },
-      ...includeRelations,
-    });
+    try {
+      return await prisma.post.create({
+        data: {
+          ...postData,
+          tags: { connect: tagConnects },
+        },
+        ...includeRelations,
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2003') {
+        throw new Error('topicId 不存在');
+      }
+      throw e;
+    }
   }
 
   async update(id: string, dto: UpdatePostDto): Promise<Post | undefined> {
     const { tags: tagNames, ...postData } = dto;
+
+    const isStatusOnlyUpdate =
+      Object.keys(postData).length === 1 &&
+      postData.status !== undefined &&
+      tagNames === undefined;
 
     try {
       const tagsOperation =
@@ -48,11 +66,18 @@ export class PostsService {
           ? { set: await upsertTags(tagNames) }
           : undefined;
 
+      let preservedUpdatedAt: Date | undefined;
+      if (isStatusOnlyUpdate) {
+        const current = await prisma.post.findUnique({ where: { id }, select: { updatedAt: true } });
+        preservedUpdatedAt = current?.updatedAt;
+      }
+
       return await prisma.post.update({
         where: { id },
         data: {
           ...postData,
           ...(tagsOperation ? { tags: tagsOperation } : {}),
+          ...(preservedUpdatedAt ? { updatedAt: preservedUpdatedAt } : {}),
         },
         ...includeRelations,
       });
@@ -61,25 +86,37 @@ export class PostsService {
     }
   }
 
-  async getList(categories?: string, topicId?: string): Promise<PostListItem[]> {
+  async getList(
+    page: number,
+    pageSize: number,
+    categories?: string,
+    topicId?: string,
+  ): Promise<{ data: PostListItem[]; total: number }> {
     const validCategories = Object.values(CategoriesType);
-    const categoriesFilter =
-      categories && validCategories.includes(categories as CategoriesType)
+    const where = {
+      status: 'published' as const,
+      ...(categories && validCategories.includes(categories as CategoriesType)
         ? { categories: categories as CategoriesType }
-        : {};
+        : {}),
+      ...(topicId ? { topicId } : {}),
+    };
 
-    return prisma.post.findMany({
-      where: {
-        ...categoriesFilter,
-        ...(topicId ? { topicId } : {}),
-      },
-      orderBy: { createdAt: "desc" },
-      select: { id: true, title: true, categories: true, topicId: true, createdAt: true },
-    });
+    const [data, total] = await prisma.$transaction([
+      prisma.post.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        select: { id: true, title: true, categories: true, topicId: true, createdAt: true },
+      }),
+      prisma.post.count({ where }),
+    ]);
+    return { data, total };
   }
 
   async getLatest(): Promise<PostLatestItem[]> {
     const posts = await prisma.post.findMany({
+      where: { status: 'published' as const },
       orderBy: { createdAt: "desc" },
       take: 5,
       select: {
