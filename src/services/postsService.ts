@@ -147,13 +147,15 @@ export class PostsService {
 async function upsertTags(names: string[]): Promise<{ id: string }[]> {
   return Promise.all(
     names.map(async (name) => {
-      const id = toSlug(name);
-      await prisma.tag.upsert({
-        where: { id },
-        create: { id, name },
+      // Look up by name (unique) so an existing tag with any ID is reused.
+      // Fall back to slug as the new ID only when creating.
+      const tag = await prisma.tag.upsert({
+        where: { name },
+        create: { id: toSlug(name), name },
         update: {},
+        select: { id: true },
       });
-      return { id };
+      return { id: tag.id };
     })
   );
 }
