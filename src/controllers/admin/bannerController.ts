@@ -6,6 +6,7 @@ import {
   Path,
   Post,
   Put,
+  Query,
   Response,
   Route,
   SuccessResponse,
@@ -13,7 +14,7 @@ import {
 } from "tsoa";
 import { BannerService } from "../../services/bannerService";
 import { CreateBannerDto, UpdateBannerDto, Banner as BannerModel } from "../../models/banner";
-import { ApiResponse } from "../../models/response";
+import { ApiResponse, PaginatedResponse } from "../../models/response";
 
 @Route("admin/banner")
 @Tags("Admin - Banner")
@@ -22,10 +23,16 @@ export class AdminBannerController extends Controller {
 
   /**
    * 取得所有後台 banner
+   * @param page 頁碼（從 1 開始）
+   * @param pageSize 每頁筆數
    */
   @Get("/")
-  public async getBanners(): Promise<ApiResponse<BannerModel[]>> {
-    return { data: await this.bannerService.getAll() };
+  public async getBanners(
+    @Query() page = 1,
+    @Query() pageSize = 10,
+  ): Promise<PaginatedResponse<BannerModel>> {
+    const { data, total } = await this.bannerService.getAll(page, pageSize);
+    return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 
   /**

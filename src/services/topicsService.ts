@@ -3,10 +3,16 @@ import { CreateTopicDto, Topic, UpdateTopicDto } from "../models/topic";
 import { prisma } from "../lib/prisma";
 
 export class TopicsService {
-  async getAll(): Promise<Topic[]> {
-    return prisma.topic.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+  async getAll(page: number, pageSize: number): Promise<{ data: Topic[]; total: number }> {
+    const [data, total] = await prisma.$transaction([
+      prisma.topic.findMany({
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.topic.count(),
+    ]);
+    return { data, total };
   }
 
   async getById(id: string): Promise<Topic | undefined> {

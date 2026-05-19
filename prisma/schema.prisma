@@ -11,6 +11,11 @@ enum CategoriesType {
   life
 }
 
+enum PostStatus {
+  published
+  draft
+}
+
 model Topic {
   id          String   @id
   name        String   @unique
@@ -25,6 +30,7 @@ model Post {
   title      String
   content    String
   categories CategoriesType
+  status     PostStatus     @default(draft)
   topicId    String?
   topic      Topic?         @relation(fields: [topicId], references: [id])
   createdAt  DateTime       @default(now())

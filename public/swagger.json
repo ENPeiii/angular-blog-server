@@ -35,18 +35,38 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ApiResponse_PublicTopic-Array_": {
-				"description": "統一 API 回傳格式",
+			"PaginatedResponse_PublicTopic_": {
+				"description": "分頁 API 回傳格式",
 				"properties": {
 					"data": {
 						"items": {
 							"$ref": "#/components/schemas/PublicTopic"
 						},
 						"type": "array"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"pageSize": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
-					"data"
+					"data",
+					"total",
+					"page",
+					"pageSize",
+					"totalPages"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -85,18 +105,38 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ApiResponse_PublicTag-Array_": {
-				"description": "統一 API 回傳格式",
+			"PaginatedResponse_PublicTag_": {
+				"description": "分頁 API 回傳格式",
 				"properties": {
 					"data": {
 						"items": {
 							"$ref": "#/components/schemas/PublicTag"
 						},
 						"type": "array"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"pageSize": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
-					"data"
+					"data",
+					"total",
+					"page",
+					"pageSize",
+					"totalPages"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -165,18 +205,38 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ApiResponse_PostListItem-Array_": {
-				"description": "統一 API 回傳格式",
+			"PaginatedResponse_PostListItem_": {
+				"description": "分頁 API 回傳格式",
 				"properties": {
 					"data": {
 						"items": {
 							"$ref": "#/components/schemas/PostListItem"
 						},
 						"type": "array"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"pageSize": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
-					"data"
+					"data",
+					"total",
+					"page",
+					"pageSize",
+					"totalPages"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -430,18 +490,38 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ApiResponse_Topic-Array_": {
-				"description": "統一 API 回傳格式",
+			"PaginatedResponse_Topic_": {
+				"description": "分頁 API 回傳格式",
 				"properties": {
 					"data": {
 						"items": {
 							"$ref": "#/components/schemas/Topic"
 						},
 						"type": "array"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"pageSize": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
-					"data"
+					"data",
+					"total",
+					"page",
+					"pageSize",
+					"totalPages"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -531,18 +611,38 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ApiResponse_Tag-Array_": {
-				"description": "統一 API 回傳格式",
+			"PaginatedResponse_Tag_": {
+				"description": "分頁 API 回傳格式",
 				"properties": {
 					"data": {
 						"items": {
 							"$ref": "#/components/schemas/Tag"
 						},
 						"type": "array"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"pageSize": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
-					"data"
+					"data",
+					"total",
+					"page",
+					"pageSize",
+					"totalPages"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -590,6 +690,14 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"PostStatus": {
+				"type": "string",
+				"enum": [
+					"published",
+					"draft"
+				],
+				"description": "文章發布狀態"
+			},
 			"PostModel": {
 				"description": "後台完整文章物件",
 				"properties": {
@@ -612,6 +720,11 @@
 						"$ref": "#/components/schemas/CategoriesType",
 						"description": "文章分類",
 						"example": "tech"
+					},
+					"status": {
+						"$ref": "#/components/schemas/PostStatus",
+						"description": "發布狀態",
+						"example": "draft"
 					},
 					"topicId": {
 						"type": "string",
@@ -653,6 +766,7 @@
 					"title",
 					"content",
 					"categories",
+					"status",
 					"topicId",
 					"topic",
 					"createdAt",
@@ -662,18 +776,38 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ApiResponse_PostModel-Array_": {
-				"description": "統一 API 回傳格式",
+			"PaginatedResponse_PostModel_": {
+				"description": "分頁 API 回傳格式",
 				"properties": {
 					"data": {
 						"items": {
 							"$ref": "#/components/schemas/PostModel"
 						},
 						"type": "array"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"pageSize": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
-					"data"
+					"data",
+					"total",
+					"page",
+					"pageSize",
+					"totalPages"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -708,6 +842,11 @@
 						"$ref": "#/components/schemas/CategoriesType",
 						"description": "文章分類（必填）",
 						"example": "tech"
+					},
+					"status": {
+						"$ref": "#/components/schemas/PostStatus",
+						"description": "發布狀態，不傳預設為 draft",
+						"example": "draft"
 					},
 					"topicId": {
 						"type": "string",
@@ -751,6 +890,11 @@
 						"$ref": "#/components/schemas/CategoriesType",
 						"description": "文章分類",
 						"example": "life"
+					},
+					"status": {
+						"$ref": "#/components/schemas/PostStatus",
+						"description": "發布狀態",
+						"example": "published"
 					},
 					"topicId": {
 						"type": "string",
@@ -817,7 +961,7 @@
 					"updatedAt": {
 						"type": "string",
 						"format": "date-time",
-						"description": "最後更新時間（UTC），未更新過則為 null",
+						"description": "最後更新時間（UTC）",
 						"example": "2024-01-20T12:00:00.000Z"
 					}
 				},
@@ -835,18 +979,38 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ApiResponse_BannerModel-Array_": {
-				"description": "統一 API 回傳格式",
+			"PaginatedResponse_BannerModel_": {
+				"description": "分頁 API 回傳格式",
 				"properties": {
 					"data": {
 						"items": {
 							"$ref": "#/components/schemas/BannerModel"
 						},
 						"type": "array"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"pageSize": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
-					"data"
+					"data",
+					"total",
+					"page",
+					"pageSize",
+					"totalPages"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -950,7 +1114,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_PublicTopic-Array_"
+									"$ref": "#/components/schemas/PaginatedResponse_PublicTopic_"
 								}
 							}
 						}
@@ -961,7 +1125,30 @@
 					"Public - Topics"
 				],
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"description": "頁碼（從 1 開始）",
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"description": "每頁筆數",
+						"in": "query",
+						"name": "pageSize",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/public/topics/{id}": {
@@ -1024,7 +1211,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_PublicTag-Array_"
+									"$ref": "#/components/schemas/PaginatedResponse_PublicTag_"
 								}
 							}
 						}
@@ -1035,7 +1222,30 @@
 					"Public - Tags"
 				],
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"description": "頁碼（從 1 開始）",
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"description": "每頁筆數",
+						"in": "query",
+						"name": "pageSize",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/public/tags/{id}": {
@@ -1098,7 +1308,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_PostListItem-Array_"
+									"$ref": "#/components/schemas/PaginatedResponse_PostListItem_"
 								}
 							}
 						}
@@ -1110,6 +1320,28 @@
 				],
 				"security": [],
 				"parameters": [
+					{
+						"description": "頁碼（從 1 開始）",
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"description": "每頁筆數",
+						"in": "query",
+						"name": "pageSize",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					},
 					{
 						"description": "文章分類（tech | life），不傳則取全部",
 						"in": "query",
@@ -1237,7 +1469,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_Topic-Array_"
+									"$ref": "#/components/schemas/PaginatedResponse_Topic_"
 								}
 							}
 						}
@@ -1248,7 +1480,30 @@
 					"Admin - Topics"
 				],
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"description": "頁碼（從 1 開始）",
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"description": "每頁筆數",
+						"in": "query",
+						"name": "pageSize",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			},
 			"post": {
 				"operationId": "CreateTopic",
@@ -1443,7 +1698,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_Tag-Array_"
+									"$ref": "#/components/schemas/PaginatedResponse_Tag_"
 								}
 							}
 						}
@@ -1454,7 +1709,30 @@
 					"Admin - Tags"
 				],
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"description": "頁碼（從 1 開始）",
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"description": "每頁筆數",
+						"in": "query",
+						"name": "pageSize",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			},
 			"post": {
 				"operationId": "CreateTag",
@@ -1649,7 +1927,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_PostModel-Array_"
+									"$ref": "#/components/schemas/PaginatedResponse_PostModel_"
 								}
 							}
 						}
@@ -1660,7 +1938,30 @@
 					"Admin - Posts"
 				],
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"description": "頁碼（從 1 開始）",
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"description": "每頁筆數",
+						"in": "query",
+						"name": "pageSize",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			},
 			"post": {
 				"operationId": "CreatePost",
@@ -1855,7 +2156,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_BannerModel-Array_"
+									"$ref": "#/components/schemas/PaginatedResponse_BannerModel_"
 								}
 							}
 						}
@@ -1866,7 +2167,30 @@
 					"Admin - Banner"
 				],
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"description": "頁碼（從 1 開始）",
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"description": "每頁筆數",
+						"in": "query",
+						"name": "pageSize",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			},
 			"post": {
 				"operationId": "CreateBanner",

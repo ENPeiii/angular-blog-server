@@ -3,10 +3,16 @@ import { CreateTagDto, Tag, UpdateTagDto } from "../models/tag";
 import { prisma } from "../lib/prisma";
 
 export class TagsService {
-  async getAll(): Promise<Tag[]> {
-    return prisma.tag.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+  async getAll(page: number, pageSize: number): Promise<{ data: Tag[]; total: number }> {
+    const [data, total] = await prisma.$transaction([
+      prisma.tag.findMany({
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.tag.count(),
+    ]);
+    return { data, total };
   }
 
   async getById(id: string): Promise<Tag | undefined> {

@@ -6,6 +6,7 @@ import {
   Path,
   Post,
   Put,
+  Query,
   Route,
   SuccessResponse,
   Tags,
@@ -13,7 +14,7 @@ import {
 } from "tsoa";
 import { CreatePostDto, Post as PostModel, UpdatePostDto } from "../../models/post";
 import { PostsService } from "../../services/postsService";
-import { ApiResponse } from "../../models/response";
+import { ApiResponse, PaginatedResponse } from "../../models/response";
 
 @Route("admin/posts")
 @Tags("Admin - Posts")
@@ -22,10 +23,16 @@ export class AdminPostsController extends Controller {
 
   /**
    * 取得所有文章清單（含後台管理欄位）
+   * @param page 頁碼（從 1 開始）
+   * @param pageSize 每頁筆數
    */
   @Get("/")
-  public async getPosts(): Promise<ApiResponse<PostModel[]>> {
-    return { data: await this.postsService.getAll() };
+  public async getPosts(
+    @Query() page = 1,
+    @Query() pageSize = 10,
+  ): Promise<PaginatedResponse<PostModel>> {
+    const { data, total } = await this.postsService.getAll(page, pageSize);
+    return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 
   /**

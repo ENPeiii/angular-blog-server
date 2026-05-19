@@ -1,7 +1,7 @@
-import { Controller, Get, Path, Route, Tags, Response } from "tsoa";
+import { Controller, Get, Path, Query, Route, Tags, Response } from "tsoa";
 import { PublicTag } from "../../models/tag";
 import { TagsService } from "../../services/tagsService";
-import { ApiResponse } from "../../models/response";
+import { ApiResponse, PaginatedResponse } from "../../models/response";
 
 @Route("public/tags")
 @Tags("Public - Tags")
@@ -10,11 +10,22 @@ export class PublicTagsController extends Controller {
 
   /**
    * 取得所有標籤清單
+   * @param page 頁碼（從 1 開始）
+   * @param pageSize 每頁筆數
    */
   @Get("/")
-  public async getTags(): Promise<ApiResponse<PublicTag[]>> {
-    const tags = await this.tagsService.getAll();
-    return { data: tags.map(({ id, name }) => ({ id, name })) };
+  public async getTags(
+    @Query() page = 1,
+    @Query() pageSize = 10,
+  ): Promise<PaginatedResponse<PublicTag>> {
+    const { data, total } = await this.tagsService.getAll(page, pageSize);
+    return {
+      data: data.map(({ id, name }) => ({ id, name })),
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
   /**

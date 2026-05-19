@@ -9,10 +9,16 @@ export class BannerService {
     return banner ?? undefined;
   }
 
-  async getAll(): Promise<Banner[]> {
-    return prisma.banner.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+  async getAll(page: number, pageSize: number): Promise<{ data: Banner[]; total: number }> {
+    const [data, total] = await prisma.$transaction([
+      prisma.banner.findMany({
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.banner.count(),
+    ]);
+    return { data, total };
   }
 
   async getById(id: string): Promise<Banner | undefined> {

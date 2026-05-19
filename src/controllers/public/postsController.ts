@@ -1,7 +1,7 @@
 import { Controller, Get, Path, Query, Route, Tags, Response } from "tsoa";
 import { PostLatestItem, PostListItem, PublicPost } from "../../models/post";
 import { PostsService } from "../../services/postsService";
-import { ApiResponse } from "../../models/response";
+import { ApiResponse, PaginatedResponse } from "../../models/response";
 
 @Route("public/posts")
 @Tags("Public - Posts")
@@ -10,15 +10,20 @@ export class PublicPostsController extends Controller {
 
   /**
    * 取得文章列表（不含內文與標籤），可依分類或主題篩選
+   * @param page 頁碼（從 1 開始）
+   * @param pageSize 每頁筆數
    * @param categories 文章分類（tech | life），不傳則取全部
    * @param topicId 主題 slug，不傳則取全部
    */
   @Get("/")
   public async getPosts(
+    @Query() page = 1,
+    @Query() pageSize = 10,
     @Query() categories?: string,
-    @Query() topicId?: string
-  ): Promise<ApiResponse<PostListItem[]>> {
-    return { data: await this.postsService.getList(categories, topicId) };
+    @Query() topicId?: string,
+  ): Promise<PaginatedResponse<PostListItem>> {
+    const { data, total } = await this.postsService.getList(page, pageSize, categories, topicId);
+    return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 
   /**

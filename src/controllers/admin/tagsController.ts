@@ -6,6 +6,7 @@ import {
   Path,
   Post,
   Put,
+  Query,
   Route,
   SuccessResponse,
   Tags,
@@ -13,7 +14,7 @@ import {
 } from "tsoa";
 import { CreateTagDto, Tag, UpdateTagDto } from "../../models/tag";
 import { TagsService } from "../../services/tagsService";
-import { ApiResponse } from "../../models/response";
+import { ApiResponse, PaginatedResponse } from "../../models/response";
 
 @Route("admin/tags")
 @Tags("Admin - Tags")
@@ -22,10 +23,16 @@ export class AdminTagsController extends Controller {
 
   /**
    * 取得所有標籤清單
+   * @param page 頁碼（從 1 開始）
+   * @param pageSize 每頁筆數
    */
   @Get("/")
-  public async getTags(): Promise<ApiResponse<Tag[]>> {
-    return { data: await this.tagsService.getAll() };
+  public async getTags(
+    @Query() page = 1,
+    @Query() pageSize = 10,
+  ): Promise<PaginatedResponse<Tag>> {
+    const { data, total } = await this.tagsService.getAll(page, pageSize);
+    return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 
   /**

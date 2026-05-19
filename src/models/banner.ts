@@ -1,4 +1,5 @@
 import { BannerType } from "@prisma/client";
+export { BannerType };
 
 export interface Banner {
   /** 唯一識別碼（UUID，由後端自動產生） @example "a1b2c3d4-e5f6-7890-abcd-ef1234567890" */
@@ -17,7 +18,7 @@ export interface Banner {
   content: string | null;
   /** 建立時間（UTC） @example "2024-01-15T08:30:00.000Z" */
   createdAt: Date;
-  /** 最後更新時間（UTC），未更新過則為 null @example "2024-01-20T12:00:00.000Z" */
+  /** 最後更新時間（UTC） @example "2024-01-20T12:00:00.000Z" */
   updatedAt: Date;
 }
 

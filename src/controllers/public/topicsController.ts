@@ -1,7 +1,7 @@
-import { Controller, Get, Path, Route, Tags, Response } from "tsoa";
+import { Controller, Get, Path, Query, Route, Tags, Response } from "tsoa";
 import { PublicTopic } from "../../models/topic";
 import { TopicsService } from "../../services/topicsService";
-import { ApiResponse } from "../../models/response";
+import { ApiResponse, PaginatedResponse } from "../../models/response";
 
 @Route("public/topics")
 @Tags("Public - Topics")
@@ -10,11 +10,22 @@ export class PublicTopicsController extends Controller {
 
   /**
    * 取得所有主題列表（含簡介）
+   * @param page 頁碼（從 1 開始）
+   * @param pageSize 每頁筆數
    */
   @Get("/")
-  public async getTopics(): Promise<ApiResponse<PublicTopic[]>> {
-    const topics = await this.topicsService.getAll();
-    return { data: topics.map(({ id, name, description }) => ({ id, name, description })) };
+  public async getTopics(
+    @Query() page = 1,
+    @Query() pageSize = 10,
+  ): Promise<PaginatedResponse<PublicTopic>> {
+    const { data, total } = await this.topicsService.getAll(page, pageSize);
+    return {
+      data: data.map(({ id, name, description }) => ({ id, name, description })),
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
   /**

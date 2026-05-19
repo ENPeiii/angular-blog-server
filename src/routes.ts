@@ -36,10 +36,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ApiResponse_PublicTopic-Array_": {
+    "PaginatedResponse_PublicTopic_": {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicTopic"},"required":true},
+            "total": {"dataType":"double","required":true},
+            "page": {"dataType":"double","required":true},
+            "pageSize": {"dataType":"double","required":true},
+            "totalPages": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -61,10 +65,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ApiResponse_PublicTag-Array_": {
+    "PaginatedResponse_PublicTag_": {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicTag"},"required":true},
+            "total": {"dataType":"double","required":true},
+            "page": {"dataType":"double","required":true},
+            "pageSize": {"dataType":"double","required":true},
+            "totalPages": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -99,10 +107,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ApiResponse_PostListItem-Array_": {
+    "PaginatedResponse_PostListItem_": {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"PostListItem"},"required":true},
+            "total": {"dataType":"double","required":true},
+            "page": {"dataType":"double","required":true},
+            "pageSize": {"dataType":"double","required":true},
+            "totalPages": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -194,10 +206,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ApiResponse_Topic-Array_": {
+    "PaginatedResponse_Topic_": {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"Topic"},"required":true},
+            "total": {"dataType":"double","required":true},
+            "page": {"dataType":"double","required":true},
+            "pageSize": {"dataType":"double","required":true},
+            "totalPages": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -239,10 +255,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ApiResponse_Tag-Array_": {
+    "PaginatedResponse_Tag_": {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"Tag"},"required":true},
+            "total": {"dataType":"double","required":true},
+            "page": {"dataType":"double","required":true},
+            "pageSize": {"dataType":"double","required":true},
+            "totalPages": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -271,6 +291,11 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PostStatus": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["published"]},{"dataType":"enum","enums":["draft"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PostModel": {
         "dataType": "refObject",
         "properties": {
@@ -278,6 +303,7 @@ const models: TsoaRoute.Models = {
             "title": {"dataType":"string","required":true},
             "content": {"dataType":"string","required":true},
             "categories": {"ref":"CategoriesType","required":true},
+            "status": {"ref":"PostStatus","required":true},
             "topicId": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
             "topic": {"dataType":"union","subSchemas":[{"ref":"PublicTopic"},{"dataType":"enum","enums":[null]}],"required":true},
             "createdAt": {"dataType":"datetime","required":true},
@@ -287,10 +313,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ApiResponse_PostModel-Array_": {
+    "PaginatedResponse_PostModel_": {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"PostModel"},"required":true},
+            "total": {"dataType":"double","required":true},
+            "page": {"dataType":"double","required":true},
+            "pageSize": {"dataType":"double","required":true},
+            "totalPages": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -309,6 +339,7 @@ const models: TsoaRoute.Models = {
             "title": {"dataType":"string","required":true},
             "content": {"dataType":"string","required":true},
             "categories": {"ref":"CategoriesType","required":true},
+            "status": {"ref":"PostStatus"},
             "topicId": {"dataType":"string"},
             "tags": {"dataType":"array","array":{"dataType":"string"}},
         },
@@ -321,6 +352,7 @@ const models: TsoaRoute.Models = {
             "title": {"dataType":"string"},
             "content": {"dataType":"string"},
             "categories": {"ref":"CategoriesType"},
+            "status": {"ref":"PostStatus"},
             "topicId": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}]},
             "tags": {"dataType":"array","array":{"dataType":"string"}},
         },
@@ -343,10 +375,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ApiResponse_BannerModel-Array_": {
+    "PaginatedResponse_BannerModel_": {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"BannerModel"},"required":true},
+            "total": {"dataType":"double","required":true},
+            "page": {"dataType":"double","required":true},
+            "pageSize": {"dataType":"double","required":true},
+            "totalPages": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -401,6 +437,8 @@ export function RegisterRoutes(app: Router) {
 
     
         const argsPublicTopicsController_getTopics: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"default":1,"in":"query","name":"page","dataType":"double"},
+                pageSize: {"default":10,"in":"query","name":"pageSize","dataType":"double"},
         };
         app.get('/public/topics',
             ...(fetchMiddlewares<RequestHandler>(PublicTopicsController)),
@@ -460,6 +498,8 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsPublicTagsController_getTags: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"default":1,"in":"query","name":"page","dataType":"double"},
+                pageSize: {"default":10,"in":"query","name":"pageSize","dataType":"double"},
         };
         app.get('/public/tags',
             ...(fetchMiddlewares<RequestHandler>(PublicTagsController)),
@@ -519,6 +559,8 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsPublicPostsController_getPosts: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"default":1,"in":"query","name":"page","dataType":"double"},
+                pageSize: {"default":10,"in":"query","name":"pageSize","dataType":"double"},
                 categories: {"in":"query","name":"categories","dataType":"string"},
                 topicId: {"in":"query","name":"topicId","dataType":"string"},
         };
@@ -638,6 +680,8 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAdminTopicsController_getTopics: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"default":1,"in":"query","name":"page","dataType":"double"},
+                pageSize: {"default":10,"in":"query","name":"pageSize","dataType":"double"},
         };
         app.get('/admin/topics',
             ...(fetchMiddlewares<RequestHandler>(AdminTopicsController)),
@@ -788,6 +832,8 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAdminTagsController_getTags: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"default":1,"in":"query","name":"page","dataType":"double"},
+                pageSize: {"default":10,"in":"query","name":"pageSize","dataType":"double"},
         };
         app.get('/admin/tags',
             ...(fetchMiddlewares<RequestHandler>(AdminTagsController)),
@@ -938,6 +984,8 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAdminPostsController_getPosts: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"default":1,"in":"query","name":"page","dataType":"double"},
+                pageSize: {"default":10,"in":"query","name":"pageSize","dataType":"double"},
         };
         app.get('/admin/posts',
             ...(fetchMiddlewares<RequestHandler>(AdminPostsController)),
@@ -1088,6 +1136,8 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAdminBannerController_getBanners: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"default":1,"in":"query","name":"page","dataType":"double"},
+                pageSize: {"default":10,"in":"query","name":"pageSize","dataType":"double"},
         };
         app.get('/admin/banner',
             ...(fetchMiddlewares<RequestHandler>(AdminBannerController)),

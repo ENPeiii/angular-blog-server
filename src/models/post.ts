@@ -1,8 +1,11 @@
-import { CategoriesType } from "@prisma/client";
 import { PublicTag } from "./tag";
 import { PublicTopic } from "./topic";
 
+import { CategoriesType } from "@prisma/client";
 export { CategoriesType };
+
+/** 文章發布狀態 */
+export type PostStatus = 'published' | 'draft';
 
 /** 後台完整文章物件 */
 export interface Post {
@@ -14,6 +17,8 @@ export interface Post {
   content: string;
   /** 文章分類 @example "tech" */
   categories: CategoriesType;
+  /** 發布狀態 @example "draft" */
+  status: PostStatus;
   /** 所屬主題 ID @example "vue-series" */
   topicId: string | null;
   /** 所屬主題 */
@@ -84,6 +89,8 @@ export interface CreatePostDto {
   content: string;
   /** 文章分類（必填） @example "tech" */
   categories: CategoriesType;
+  /** 發布狀態，不傳預設為 draft @example "draft" */
+  status?: PostStatus;
   /** 所屬主題 ID @example "vue-series" */
   topicId?: string;
   /** 標籤名稱清單，tag 不存在時自動建立 @example ["TypeScript", "Vue 3"] */
@@ -98,6 +105,8 @@ export interface UpdatePostDto {
   content?: string;
   /** 文章分類 @example "life" */
   categories?: CategoriesType;
+  /** 發布狀態 @example "published" */
+  status?: PostStatus;
   /** 所屬主題 ID（傳 null 可解除關聯） @example "vue-series" */
   topicId?: string | null;
   /** 傳入則完整替換文章的 tag 列表 @example ["TypeScript"] */
