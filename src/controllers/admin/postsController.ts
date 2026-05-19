@@ -25,13 +25,15 @@ export class AdminPostsController extends Controller {
    * 取得所有文章清單（含後台管理欄位）
    * @param page 頁碼（從 1 開始）
    * @param pageSize 每頁筆數
+   * @param tagId 依標籤 ID 篩選
    */
   @Get("/")
   public async getPosts(
     @Query() page = 1,
     @Query() pageSize = 10,
+    @Query() tagId?: string,
   ): Promise<PaginatedResponse<PostModel>> {
-    const { data, total } = await this.postsService.getAll(page, pageSize);
+    const { data, total } = await this.postsService.getAll(page, pageSize, tagId);
     return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 

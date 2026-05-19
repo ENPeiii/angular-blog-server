@@ -25,13 +25,15 @@ export class AdminTagsController extends Controller {
    * 取得所有標籤清單
    * @param page 頁碼（從 1 開始）
    * @param pageSize 每頁筆數
+   * @param search 依標籤名稱模糊搜尋
    */
   @Get("/")
   public async getTags(
     @Query() page = 1,
     @Query() pageSize = 10,
+    @Query() search?: string,
   ): Promise<PaginatedResponse<Tag>> {
-    const { data, total } = await this.tagsService.getAll(page, pageSize);
+    const { data, total } = await this.tagsService.getAll(page, pageSize, search);
     return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 

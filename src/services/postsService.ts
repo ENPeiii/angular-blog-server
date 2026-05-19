@@ -11,15 +11,21 @@ const includeRelations = {
 } as const;
 
 export class PostsService {
-  async getAll(page: number, pageSize: number): Promise<{ data: Post[]; total: number }> {
+  async getAll(
+    page: number,
+    pageSize: number,
+    tagId?: string,
+  ): Promise<{ data: Post[]; total: number }> {
+    const where = tagId ? { tags: { some: { id: tagId } } } : {};
     const [data, total] = await prisma.$transaction([
       prisma.post.findMany({
+        where,
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * pageSize,
         take: pageSize,
         ...includeRelations,
       }),
-      prisma.post.count(),
+      prisma.post.count({ where }),
     ]);
     return { data, total };
   }

@@ -4,6 +4,8 @@ export interface Tag {
   id: string;
   /** 標籤名稱 @example "TypeScript" */
   name: string;
+  /** 使用此標籤的文章數 @example 5 */
+  postCount: number;
   /** 建立時間（UTC） @example "2024-01-15T08:30:00.000Z" */
   createdAt: Date;
   /** 最後更新時間（UTC），未更新過則為 null @example "2024-01-20T12:00:00.000Z" */
