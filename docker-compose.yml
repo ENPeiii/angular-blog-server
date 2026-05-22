@@ -12,5 +12,16 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  app:
+    build: .
+    container_name: angular_blog_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://enpei:Pei830509@postgres:5432/angular_blog_db
+    depends_on:
+      - postgres
+
 volumes:
   postgres_data:
