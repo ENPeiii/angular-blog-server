@@ -1,4 +1,4 @@
-name: Deploy Blog to GCP
+name: Deploy Image to GCP
 
 on:
   workflow_run:
@@ -14,7 +14,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Check out the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # 3. 【修正版】單獨把檔案空投過去，並「拔除」原本的 docker/ 前綴資料夾結構
       - name: Copy docker-compose.prod.yml to GCP VM
