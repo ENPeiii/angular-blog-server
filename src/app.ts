@@ -9,7 +9,13 @@ import * as path from "path";
 
 export const app: Application = express();
 
-app.use(cors({ origin: "http://localhost:4200" }));
+const allowedOrigins = [
+  "http://localhost:4200",
+  "https://enpei.com.tw",
+  "https://www.enpei.com.tw",
+  "https://admin.enpei.com.tw",
+];
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -4,6 +4,7 @@ dist
 .github
 .claude
 notes
+nginx
 .env*
 *.log
 npm-debug.log*
