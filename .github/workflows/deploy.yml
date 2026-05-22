@@ -38,12 +38,21 @@ jobs:
             # 遠端叫 GCP 登入 ghcr.io
             echo "${{ secrets.GH_CR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            # 💡 直接讀取家目錄下的檔案（拿掉了中間的 /docker/ 路徑）
+            # 建立 .env 給 docker-compose 讀取
+            cat > ~/env.prod << EOF
+            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+            DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/${{ secrets.POSTGRES_DB }}
+            NODE_ENV=production
+            PORT=3000
+            EOF
+
             # 根據 docker-compose.prod.yml 抓取最新 Image
-            docker compose -f ~/docker-compose.prod.yml pull
+            docker compose -f ~/docker-compose.prod.yml --env-file ~/env.prod pull
 
             # 重新啟動容器
-            docker compose -f ~/docker-compose.prod.yml up -d
+            docker compose -f ~/docker-compose.prod.yml --env-file ~/env.prod up -d
 
             # 清理舊 Image
             docker image prune -f
