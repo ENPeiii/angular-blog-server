@@ -1,37 +1,17 @@
-name: Build and Deploy Blog to GCP
+name: Deploy Blog to GCP
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Build and Push Docker Image"]
+    types:
+      - completed
     branches:
-      - issue/CICD-test # 只要你 push 到 issue/CICD-test 分支，GitHub 就會自動發動！
+      - issue/CICD-test
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the code
-        uses: actions/checkout@v4
-
-      # 1. 讓 GitHub 自己登入到自己的 GHCR 儲存庫
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GH_CR_TOKEN }}
-
-      # 2. 自動打包你的 Node.js App Image，推上 ghcr.io
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/Dockerfile # 這裡指定了你放在 docker/底下的 Dockerfile，正確！
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/angular-blog-app:latest
-
   deploy-to-gcp:
-    needs: build-and-push # 確保 Image 成功推上 GHCR 後，才執行 GCP 部署
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
