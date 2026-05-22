@@ -16,18 +16,15 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v5
 
-      # 3. 【修正版】單獨把檔案空投過去，並「拔除」原本的 docker/ 前綴資料夾結構
       - name: Copy docker-compose.prod.yml to GCP VM
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.GCP_HOST }}
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_SSH_KEY }}
-          source: "docker/docker-compose.prod.yml"
+          source: "docker-compose.prod.yml"
           target: "~/"
-          strip_components: 1 # 💡 這行是魔法！它會把 "docker/" 這個外殼剝掉，只傳送檔案本身
 
-      # 4. 【遠端下令】現在檔案直接躺在 ~/ 目录下了，指令變得極度簡單精確
       - name: Executing remote SSH commands to deploy
         uses: appleboy/ssh-action@v1.0.3
         with:

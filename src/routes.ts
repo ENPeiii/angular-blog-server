@@ -249,6 +249,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "id": {"dataType":"string","required":true},
             "name": {"dataType":"string","required":true},
+            "postCount": {"dataType":"double","required":true},
             "createdAt": {"dataType":"datetime","required":true},
             "updatedAt": {"dataType":"datetime","required":true},
         },
@@ -834,6 +835,7 @@ export function RegisterRoutes(app: Router) {
         const argsAdminTagsController_getTags: Record<string, TsoaRoute.ParameterSchema> = {
                 page: {"default":1,"in":"query","name":"page","dataType":"double"},
                 pageSize: {"default":10,"in":"query","name":"pageSize","dataType":"double"},
+                search: {"in":"query","name":"search","dataType":"string"},
         };
         app.get('/admin/tags',
             ...(fetchMiddlewares<RequestHandler>(AdminTagsController)),
@@ -986,6 +988,7 @@ export function RegisterRoutes(app: Router) {
         const argsAdminPostsController_getPosts: Record<string, TsoaRoute.ParameterSchema> = {
                 page: {"default":1,"in":"query","name":"page","dataType":"double"},
                 pageSize: {"default":10,"in":"query","name":"pageSize","dataType":"double"},
+                tagId: {"in":"query","name":"tagId","dataType":"string"},
         };
         app.get('/admin/posts',
             ...(fetchMiddlewares<RequestHandler>(AdminPostsController)),

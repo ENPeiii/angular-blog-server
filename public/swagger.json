@@ -589,6 +589,12 @@
 						"description": "標籤名稱",
 						"example": "TypeScript"
 					},
+					"postCount": {
+						"type": "number",
+						"format": "double",
+						"description": "使用此標籤的文章數",
+						"example": 5
+					},
 					"createdAt": {
 						"type": "string",
 						"format": "date-time",
@@ -605,6 +611,7 @@
 				"required": [
 					"id",
 					"name",
+					"postCount",
 					"createdAt",
 					"updatedAt"
 				],
@@ -1731,6 +1738,15 @@
 							"format": "double",
 							"type": "number"
 						}
+					},
+					{
+						"description": "依標籤名稱模糊搜尋",
+						"in": "query",
+						"name": "search",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			},
@@ -1959,6 +1975,15 @@
 							"default": 10,
 							"format": "double",
 							"type": "number"
+						}
+					},
+					{
+						"description": "依標籤 ID 篩選",
+						"in": "query",
+						"name": "tagId",
+						"required": false,
+						"schema": {
+							"type": "string"
 						}
 					}
 				]

@@ -1,18 +1,17 @@
 # 常用指令
 
-
 ## 開發啟動
 
 每次開發前，依序確認以下三個都有跑：
 
 | 順序 | 指令 | 說明 | 終端機分頁 |
 |------|------|------|-----------|
-| 1 | `docker compose up -d` | 啟動 PostgreSQL 容器（背景執行） | 不需要佔分頁 |
+| 1 | `docker compose up postgres -d` | 啟動 PostgreSQL 容器（背景執行） | 不需要佔分頁 |
 | 2 | `npm run dev` | 啟動 Node.js 伺服器 | 分頁 1 |
 | 3 | `npm run studio` | 開啟資料庫視覺化介面（需要時才開） | 分頁 2 |
 
-> Docker 用 `-d` 背景執行，啟動後不需要佔終端機分頁。
-> Studio 不是每次都需要，想查資料時再開。
+> 本地開發只需要啟動 `postgres` 這個 service，Node 伺服器直接跑在機器上。
+> `docker compose up -d`（不加 service 名稱）會把 postgres 和 app 容器都啟動，是測試完整 Docker 環境才用的。
 
 ---
 
@@ -21,6 +20,7 @@
 | 指令 | 說明 |
 |------|------|
 | `npm run dev` | 開發模式，存檔自動重啟伺服器 |
+| `npm run docker` | 以 Docker 跑完整 app + postgres（等同 `docker compose up -d`） |
 | `npm run studio` | 開啟 Prisma Studio（瀏覽器視覺化資料庫介面） |
 | `npm run tsoa` | 重新產生 `routes.ts` 和 `swagger.json` |
 | `npm run build` | 編譯 TypeScript（部署用） |
@@ -32,12 +32,14 @@
 
 | 指令 | 說明 |
 |------|------|
-| `docker compose up -d` | 啟動容器（背景執行） |
+| `docker compose up postgres -d` | 只啟動 postgres 容器（本地開發用） |
+| `docker compose up -d` | 啟動所有容器：postgres + app |
 | `docker compose stop` | 停止容器（資料保留） |
 | `docker compose down` | 停止並移除容器（資料保留） |
 | `docker compose down -v` | 停止並清除所有資料（危險！） |
 | `docker ps` | 查看目前執行中的容器 |
-| `docker logs angular_blog_postgres` | 查看容器 log |
+| `docker logs angular_blog_postgres` | 查看 postgres 容器 log |
+| `docker logs angular_blog_app` | 查看 app 容器 log |
 
 ---
 

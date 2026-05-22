@@ -2,4 +2,8 @@ node_modules
 dist
 .git
 .github
+.claude
 notes
+.env*
+*.log
+npm-debug.log*
