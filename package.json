@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsoa spec-and-routes && tsc",
     "tsoa": "tsoa spec-and-routes",
-    "docker": "docker compose up -d",
+    "docker": "docker compose -f docker/docker-compose.yml up -d",
     "studio": "prisma studio",
     "dev": "concurrently \"nodemon\" \"tsoa spec-and-routes --watch\"",
     "start": "node dist/server.js",
