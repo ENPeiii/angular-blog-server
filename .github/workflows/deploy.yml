@@ -16,16 +16,47 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v5
 
-      - name: Copy docker-compose.prod.yml to GCP VM
+      - name: Copy files to GCP VM
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.GCP_HOST }}
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_SSH_KEY }}
-          source: "docker-compose.prod.yml"
+          source: "docker-compose.prod.yml,nginx/api.enpei.com.tw.conf"
           target: "~/"
 
-      - name: Executing remote SSH commands to deploy
+      - name: Setup nginx + SSL (first deploy only)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          script: |
+            CERT_PATH="/etc/letsencrypt/live/api.enpei.com.tw/fullchain.pem"
+
+            if [ ! -f "$CERT_PATH" ]; then
+              echo "=== First-time: installing nginx + certbot ==="
+              sudo apt-get update -qq
+              sudo apt-get install -y -qq nginx certbot python3-certbot-nginx
+
+              # 啟用 nginx site（HTTP only）
+              sudo cp ~/nginx/api.enpei.com.tw.conf /etc/nginx/sites-available/api.enpei.com.tw
+              sudo ln -sf /etc/nginx/sites-available/api.enpei.com.tw /etc/nginx/sites-enabled/
+              sudo nginx -t && sudo systemctl reload nginx
+
+              # 申請 SSL 憑證，certbot 自動把 nginx config 升級為 HTTPS + redirect
+              sudo certbot --nginx \
+                -d api.enpei.com.tw \
+                --non-interactive \
+                --agree-tos \
+                -m "${{ secrets.CERTBOT_EMAIL }}" \
+                --redirect
+              echo "=== SSL setup complete ==="
+            else
+              echo "=== SSL already configured, skipping ==="
+            fi
+
+      - name: Deploy Docker containers
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.GCP_HOST }}
