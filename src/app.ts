@@ -11,6 +11,7 @@ export const app: Application = express();
 
 const allowedOrigins = [
   "http://localhost:4200",
+  "http://localhost:4300",
   "https://enpei.com.tw",
   "https://www.enpei.com.tw",
   "https://admin.enpei.com.tw",
