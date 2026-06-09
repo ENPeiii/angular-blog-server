@@ -84,6 +84,68 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"TopicNavPost": {
+				"description": "前台主題 nav 單篇文章",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "文章 UUID"
+					},
+					"name": {
+						"type": "string",
+						"description": "文章標題"
+					}
+				},
+				"required": [
+					"id",
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TopicNavSection": {
+				"description": "前台主題 nav 章節",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "章節 UUID"
+					},
+					"name": {
+						"type": "string",
+						"description": "章節名稱"
+					},
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/TopicNavPost"
+						},
+						"type": "array",
+						"description": "此章節下的文章"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"items"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_TopicNavSection-Array_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/TopicNavSection"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"PublicTag": {
 				"description": "前台公開標籤物件（不含後台管理欄位）",
 				"properties": {
@@ -467,6 +529,12 @@
 						"description": "主題簡介",
 						"example": "從零開始學 Vue 3"
 					},
+					"postCount": {
+						"type": "number",
+						"format": "double",
+						"description": "此主題下的文章數",
+						"example": 5
+					},
 					"createdAt": {
 						"type": "string",
 						"format": "date-time",
@@ -484,6 +552,7 @@
 					"id",
 					"name",
 					"description",
+					"postCount",
 					"createdAt",
 					"updatedAt"
 				],
@@ -522,6 +591,140 @@
 					"page",
 					"pageSize",
 					"totalPages"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TopicSectionPost": {
+				"description": "章節內的文章摘要（用於後台主題詳情）",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "文章 UUID",
+						"example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+					},
+					"title": {
+						"type": "string",
+						"description": "文章標題",
+						"example": "我的第一篇文章"
+					},
+					"order": {
+						"type": "number",
+						"format": "double",
+						"description": "在章節內的排序",
+						"example": 0
+					}
+				},
+				"required": [
+					"id",
+					"title",
+					"order"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TopicSection": {
+				"description": "後台主題章節物件",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "章節 UUID",
+						"example": "b2c3d4e5-..."
+					},
+					"name": {
+						"type": "string",
+						"description": "章節名稱",
+						"example": "前導知識"
+					},
+					"order": {
+						"type": "number",
+						"format": "double",
+						"description": "章節排序",
+						"example": 0
+					},
+					"posts": {
+						"items": {
+							"$ref": "#/components/schemas/TopicSectionPost"
+						},
+						"type": "array",
+						"description": "此章節下的文章列表（依 order 排序）"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"order",
+					"posts"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TopicWithSections": {
+				"description": "後台主題詳情（含章節與文章）",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "主題 slug",
+						"example": "vue-series"
+					},
+					"name": {
+						"type": "string",
+						"description": "主題名稱",
+						"example": "Vue 系列"
+					},
+					"description": {
+						"type": "string",
+						"nullable": true,
+						"description": "主題簡介",
+						"example": "從零開始學 Vue 3"
+					},
+					"postCount": {
+						"type": "number",
+						"format": "double",
+						"description": "此主題下的文章數",
+						"example": 5
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "建立時間（UTC）",
+						"example": "2024-01-15T08:30:00.000Z"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "最後更新時間（UTC）",
+						"example": "2024-01-20T12:00:00.000Z"
+					},
+					"sections": {
+						"items": {
+							"$ref": "#/components/schemas/TopicSection"
+						},
+						"type": "array",
+						"description": "章節列表（依 order 排序）"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"description",
+					"postCount",
+					"createdAt",
+					"updatedAt",
+					"sections"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_TopicWithSections_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/TopicWithSections"
+					}
+				},
+				"required": [
+					"data"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -573,6 +776,58 @@
 						"example": "從零開始學 Vue 3"
 					}
 				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SyncSectionItem": {
+				"description": "同步主題章節時單一章節的資料",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "現有章節的 UUID，null 表示新增",
+						"example": "b2c3d4e5-..."
+					},
+					"name": {
+						"type": "string",
+						"description": "章節名稱",
+						"example": "前導知識"
+					},
+					"order": {
+						"type": "number",
+						"format": "double",
+						"description": "章節排序",
+						"example": 0
+					},
+					"postIds": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array",
+						"description": "此章節下的文章 UUID 列表（依排序）"
+					}
+				},
+				"required": [
+					"name",
+					"order",
+					"postIds"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SyncSectionsDto": {
+				"description": "同步主題章節的請求資料",
+				"properties": {
+					"sections": {
+						"items": {
+							"$ref": "#/components/schemas/SyncSectionItem"
+						},
+						"type": "array",
+						"description": "章節列表（完整替換現有章節狀態）"
+					}
+				},
+				"required": [
+					"sections"
+				],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -748,6 +1003,19 @@
 						"nullable": true,
 						"description": "所屬主題"
 					},
+					"topicSectionId": {
+						"type": "string",
+						"nullable": true,
+						"description": "所屬章節 ID",
+						"example": "b2c3d4e5-..."
+					},
+					"topicOrder": {
+						"type": "number",
+						"format": "double",
+						"nullable": true,
+						"description": "在章節內的排序",
+						"example": 0
+					},
 					"createdAt": {
 						"type": "string",
 						"format": "date-time",
@@ -776,6 +1044,8 @@
 					"status",
 					"topicId",
 					"topic",
+					"topicSectionId",
+					"topicOrder",
 					"createdAt",
 					"updatedAt",
 					"tags"
@@ -1209,6 +1479,57 @@
 				]
 			}
 		},
+		"/public/topics/{id}/nav": {
+			"get": {
+				"operationId": "GetTopicNav",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_TopicNavSection-Array_"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Topic not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "取得主題的章節導覽結構（供前台側邊選單使用，僅含已發布文章）",
+				"tags": [
+					"Public - Topics"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "主題 slug",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
 		"/public/tags": {
 			"get": {
 				"operationId": "GetTags",
@@ -1553,7 +1874,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_Topic_"
+									"$ref": "#/components/schemas/ApiResponse_TopicWithSections_"
 								}
 							}
 						}
@@ -1577,7 +1898,7 @@
 						}
 					}
 				},
-				"description": "根據 ID 取得單一主題",
+				"description": "根據 ID 取得單一主題（含章節與文章）",
 				"tags": [
 					"Admin - Topics"
 				],
@@ -1626,7 +1947,7 @@
 						}
 					}
 				},
-				"description": "更新指定主題",
+				"description": "更新指定主題的基本資訊（name / description）",
 				"tags": [
 					"Admin - Topics"
 				],
@@ -1694,6 +2015,60 @@
 						}
 					}
 				]
+			}
+		},
+		"/admin/topics/{id}/sections": {
+			"put": {
+				"operationId": "SyncTopicSections",
+				"responses": {
+					"204": {
+						"description": "Synced"
+					},
+					"404": {
+						"description": "Topic not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "同步主題章節結構（完整替換現有章節與文章歸屬）",
+				"tags": [
+					"Admin - Topics"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "主題 slug",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SyncSectionsDto"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/admin/tags": {

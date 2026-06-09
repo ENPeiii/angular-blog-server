@@ -23,6 +23,10 @@ export interface Post {
   topicId: string | null;
   /** 所屬主題 */
   topic: PublicTopic | null;
+  /** 所屬章節 ID @example "b2c3d4e5-..." */
+  topicSectionId: string | null;
+  /** 在章節內的排序 @example 0 */
+  topicOrder: number | null;
   /** 建立時間（UTC） @example "2024-01-15T08:30:00.000Z" */
   createdAt: Date;
   /** 最後更新時間（UTC） @example "2024-01-20T12:00:00.000Z" */

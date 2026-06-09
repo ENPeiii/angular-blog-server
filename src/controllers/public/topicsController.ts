@@ -1,5 +1,5 @@
 import { Controller, Get, Path, Query, Route, Tags, Response } from "tsoa";
-import { PublicTopic } from "../../models/topic";
+import { PublicTopic, TopicNavSection } from "../../models/topic";
 import { TopicsService } from "../../services/topicsService";
 import { ApiResponse, PaginatedResponse } from "../../models/response";
 
@@ -41,5 +41,20 @@ export class PublicTopicsController extends Controller {
       throw new Error("Topic not found");
     }
     return { data: { id: topic.id, name: topic.name, description: topic.description } };
+  }
+
+  /**
+   * 取得主題的章節導覽結構（供前台側邊選單使用，僅含已發布文章）
+   * @param id 主題 slug
+   */
+  @Get("{id}/nav")
+  @Response<{ message: string }>(404, "Topic not found")
+  public async getTopicNav(@Path() id: string): Promise<ApiResponse<TopicNavSection[]>> {
+    const nav = await this.topicsService.getTopicNav(id);
+    if (!nav) {
+      this.setStatus(404);
+      throw new Error("Topic not found");
+    }
+    return { data: nav };
   }
 }

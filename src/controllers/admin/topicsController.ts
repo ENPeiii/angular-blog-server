@@ -12,7 +12,13 @@ import {
   Tags,
   Response,
 } from "tsoa";
-import { CreateTopicDto, Topic, UpdateTopicDto } from "../../models/topic";
+import {
+  CreateTopicDto,
+  SyncSectionsDto,
+  Topic,
+  TopicWithSections,
+  UpdateTopicDto,
+} from "../../models/topic";
 import { TopicsService } from "../../services/topicsService";
 import { ApiResponse, PaginatedResponse } from "../../models/response";
 
@@ -36,13 +42,13 @@ export class AdminTopicsController extends Controller {
   }
 
   /**
-   * 根據 ID 取得單一主題
+   * 根據 ID 取得單一主題（含章節與文章）
    * @param id 主題 slug
    */
   @Get("{id}")
   @Response<{ message: string }>(404, "Topic not found")
-  public async getTopic(@Path() id: string): Promise<ApiResponse<Topic>> {
-    const topic = await this.topicsService.getById(id);
+  public async getTopic(@Path() id: string): Promise<ApiResponse<TopicWithSections>> {
+    const topic = await this.topicsService.getByIdWithSections(id);
     if (!topic) {
       this.setStatus(404);
       throw new Error("Topic not found");
@@ -61,7 +67,7 @@ export class AdminTopicsController extends Controller {
   }
 
   /**
-   * 更新指定主題
+   * 更新指定主題的基本資訊（name / description）
    * @param id 主題 slug
    */
   @Put("{id}")
@@ -76,6 +82,26 @@ export class AdminTopicsController extends Controller {
       throw new Error("Topic not found");
     }
     return { data: topic };
+  }
+
+  /**
+   * 同步主題章節結構（完整替換現有章節與文章歸屬）
+   * @param id 主題 slug
+   */
+  @Put("{id}/sections")
+  @SuccessResponse(204, "Synced")
+  @Response<{ message: string }>(404, "Topic not found")
+  public async syncTopicSections(
+    @Path() id: string,
+    @Body() body: SyncSectionsDto
+  ): Promise<void> {
+    const topic = await this.topicsService.getById(id);
+    if (!topic) {
+      this.setStatus(404);
+      throw new Error("Topic not found");
+    }
+    await this.topicsService.syncSections(id, body);
+    this.setStatus(204);
   }
 
   /**
