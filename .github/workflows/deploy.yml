@@ -1,0 +1,85 @@
+name: Deploy Image to GCP
+
+on:
+  workflow_run:
+    workflows: ["Build and Push Docker Image"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  deploy-to-gcp:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v5
+
+      - name: Copy files to GCP VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          source: "docker-compose.prod.yml,nginx/api.enpei.com.tw.conf"
+          target: "~/"
+
+      - name: Setup nginx + SSL (first deploy only)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          script: |
+            CERT_PATH="/etc/letsencrypt/live/api.enpei.com.tw/fullchain.pem"
+
+            if [ ! -f "$CERT_PATH" ]; then
+              echo "=== First-time: installing nginx + certbot ==="
+              sudo apt-get update -qq
+              sudo apt-get install -y -qq nginx certbot python3-certbot-nginx
+
+              # 啟用 nginx site（HTTP only）
+              sudo cp ~/nginx/api.enpei.com.tw.conf /etc/nginx/sites-available/api.enpei.com.tw
+              sudo ln -sf /etc/nginx/sites-available/api.enpei.com.tw /etc/nginx/sites-enabled/
+              sudo nginx -t && sudo systemctl reload nginx
+
+              # 申請 SSL 憑證，certbot 自動把 nginx config 升級為 HTTPS + redirect
+              sudo certbot --nginx \
+                -d api.enpei.com.tw \
+                --non-interactive \
+                --agree-tos \
+                -m "${{ secrets.CERTBOT_EMAIL }}" \
+                --redirect
+              echo "=== SSL setup complete ==="
+            else
+              echo "=== SSL already configured, skipping ==="
+            fi
+
+      - name: Deploy Docker containers
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          script: |
+            # 遠端叫 GCP 登入 ghcr.io
+            echo "${{ secrets.GH_CR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # 建立 .env 給 docker-compose 讀取
+            printf '%s\n' \
+              "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" \
+              "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" \
+              "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" \
+              "DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/${{ secrets.POSTGRES_DB }}" \
+              "NODE_ENV=production" \
+              "PORT=3000" > ~/env.prod
+
+            # 根據 docker-compose.prod.yml 抓取最新 Image
+            docker compose -f ~/docker-compose.prod.yml --env-file ~/env.prod pull
+
+            # 重新啟動容器
+            docker compose -f ~/docker-compose.prod.yml --env-file ~/env.prod up -d
+
+            # 清理舊 Image
+            docker image prune -f
