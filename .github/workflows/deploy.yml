@@ -6,7 +6,7 @@ on:
     types:
       - completed
     branches:
-      - issue/CICD-test
+      - main
 
 jobs:
   deploy-to-gcp:

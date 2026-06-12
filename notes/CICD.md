@@ -32,7 +32,7 @@
 
 ## Workflow 一：Build and Push（docker-build.yml）
 
-**觸發條件：** push 或 PR 到 `issue/CICD-test` 分支
+**觸發條件：** push 或 PR 到 `main` 分支
 
 **做了什麼：**
 
@@ -47,8 +47,8 @@
 
 **所需 Secret：**
 
-| Secret | 說明 |
-|--------|------|
+| Secret         | 說明                            |
+| -------------- | ------------------------------- |
 | `GITHUB_TOKEN` | GitHub 自動提供，不需要手動設定 |
 
 ---
@@ -77,15 +77,15 @@ docker image prune -f
 
 **所需 Secrets：**
 
-| Secret | 說明 |
-|--------|------|
-| `GCP_HOST` | GCP VM 的 IP 或 domain |
-| `GCP_USERNAME` | SSH 登入帳號 |
-| `GCP_SSH_KEY` | SSH 私鑰（對應 VM 上的 authorized_keys） |
-| `GH_CR_TOKEN` | GitHub Personal Access Token，用來在 VM 上 pull private image |
-| `POSTGRES_USER` | PostgreSQL 帳號 |
-| `POSTGRES_PASSWORD` | PostgreSQL 密碼 |
-| `POSTGRES_DB` | 資料庫名稱 |
+| Secret              | 說明                                                          |
+| ------------------- | ------------------------------------------------------------- |
+| `GCP_HOST`          | GCP VM 的 IP 或 domain                                        |
+| `GCP_USERNAME`      | SSH 登入帳號                                                  |
+| `GCP_SSH_KEY`       | SSH 私鑰（對應 VM 上的 authorized_keys）                      |
+| `GH_CR_TOKEN`       | GitHub Personal Access Token，用來在 VM 上 pull private image |
+| `POSTGRES_USER`     | PostgreSQL 帳號                                               |
+| `POSTGRES_PASSWORD` | PostgreSQL 密碼                                               |
+| `POSTGRES_DB`       | 資料庫名稱                                                    |
 
 > Secrets 在 GitHub repo → Settings → Secrets and variables → Actions 設定。
 
@@ -157,7 +157,7 @@ docker compose down
 ### deploy.yml 沒有被觸發
 
 - 確認 `docker-build.yml` 有成功跑完（不是 failed 或 cancelled）
-- `workflow_run` trigger 只在 default branch 可靠，目前設定的是 `issue/CICD-test`
+- `workflow_run` trigger 只在 default branch 可靠，目前設定的是 `main`
 
 ### GCP VM 上的容器跑舊版 image
 

@@ -2,9 +2,9 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [issue/CICD-test]
+    branches: [main]
   pull_request:
-    branches: [issue/CICD-test]
+    branches: [main]
 
 env:
   REGISTRY: ghcr.io
