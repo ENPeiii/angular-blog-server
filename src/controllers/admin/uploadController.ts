@@ -2,12 +2,11 @@ import { Controller, Post, Route, Tags, UploadedFile, Response } from "tsoa";
 import { UploadService } from "../../services/uploadService";
 import { ApiResponse } from "../../models/response";
 
-export interface UploadImageResult {
-  url: string;
-}
+export interface UploadImageResult { url: string; }
+export interface CleanupResult { deleted: number; }
 
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 @Route("admin/upload")
 @Tags("Admin - Upload")
@@ -28,8 +27,16 @@ export class AdminUploadController extends Controller {
       this.setStatus(400);
       throw new Error("圖片檔案過大，請小於 5MB");
     }
-
     const url = await this.uploadService.uploadImage(file);
     return { data: { url } };
+  }
+
+  /**
+   * 清除超過 1 天且未關聯任何文章的孤兒圖片（GCS + DB）
+   */
+  @Post("cleanup")
+  public async cleanupOrphanImages(): Promise<ApiResponse<CleanupResult>> {
+    const deleted = await this.uploadService.cleanupOrphanImages();
+    return { data: { deleted } };
   }
 }

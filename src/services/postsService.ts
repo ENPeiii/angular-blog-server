@@ -2,6 +2,14 @@ import { Prisma } from "@prisma/client";
 import { toSlug } from "../lib/slug";
 import { CategoriesType, CreatePostDto, Post, PostLatestItem, PostListItem, UpdatePostDto } from "../models/post";
 import { prisma } from "../lib/prisma";
+import { UploadService } from "./uploadService";
+
+const uploadService = new UploadService();
+
+function extractGcsImageUrls(content: string): string[] {
+  const regex = /https:\/\/storage\.googleapis\.com\/[^\s)"]+/g;
+  return [...new Set(content.match(regex) ?? [])];
+}
 
 const includeRelations = {
   include: {
@@ -43,13 +51,23 @@ export class PostsService {
     const tagConnects = await upsertTags(tagNames);
 
     try {
-      return await prisma.post.create({
+      const post = await prisma.post.create({
         data: {
           ...postData,
           tags: { connect: tagConnects },
         },
         ...includeRelations,
       });
+
+      const urls = extractGcsImageUrls(dto.content);
+      if (urls.length > 0) {
+        await prisma.postImage.updateMany({
+          where: { url: { in: urls } },
+          data: { postId: post.id },
+        });
+      }
+
+      return post;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2003') {
         throw new Error('topicId 不存在');
@@ -78,7 +96,7 @@ export class PostsService {
         preservedUpdatedAt = current?.updatedAt;
       }
 
-      return await prisma.post.update({
+      const updated = await prisma.post.update({
         where: { id },
         data: {
           ...postData,
@@ -87,6 +105,24 @@ export class PostsService {
         },
         ...includeRelations,
       });
+
+      if (dto.content !== undefined) {
+        const newUrls = extractGcsImageUrls(dto.content);
+        // 新增的圖片關聯到此文章
+        if (newUrls.length > 0) {
+          await prisma.postImage.updateMany({
+            where: { url: { in: newUrls } },
+            data: { postId: id },
+          });
+        }
+        // 從內容中移除的圖片變成孤兒，等待 cleanup
+        await prisma.postImage.updateMany({
+          where: { postId: id, url: { notIn: newUrls } },
+          data: { postId: null },
+        });
+      }
+
+      return updated;
     } catch {
       return undefined;
     }
@@ -142,6 +178,9 @@ export class PostsService {
 
   async delete(id: string): Promise<boolean> {
     try {
+      const images = await prisma.postImage.findMany({ where: { postId: id } });
+      await Promise.allSettled(images.map((img) => uploadService.deleteImage(img.gcsPath)));
+      await prisma.postImage.deleteMany({ where: { postId: id } });
       await prisma.post.delete({ where: { id } });
       return true;
     } catch {

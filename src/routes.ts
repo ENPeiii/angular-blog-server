@@ -241,6 +241,22 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CleanupResult": {
+        "dataType": "refObject",
+        "properties": {
+            "deleted": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_CleanupResult_": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"ref":"CleanupResult","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Topic": {
         "dataType": "refObject",
         "properties": {
@@ -848,6 +864,35 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'uploadImage',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminUploadController_cleanupOrphanImages: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.post('/admin/upload/cleanup',
+            ...(fetchMiddlewares<RequestHandler>(AdminUploadController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminUploadController.prototype.cleanupOrphanImages)),
+
+            async function AdminUploadController_cleanupOrphanImages(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminUploadController_cleanupOrphanImages, request, response });
+
+                const controller = new AdminUploadController();
+
+              await templateService.apiHandler({
+                methodName: 'cleanupOrphanImages',
                 controller,
                 response,
                 next,

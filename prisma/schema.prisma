@@ -51,6 +51,16 @@ model Post {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   tags           Tag[]
+  images         PostImage[]
+}
+
+model PostImage {
+  id        String   @id @default(uuid())
+  url       String   @unique
+  gcsPath   String
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
 }
 
 model Tag {
