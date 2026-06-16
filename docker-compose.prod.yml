@@ -27,6 +27,9 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-3000}
+      GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
+      GCS_PROJECT_ID: ${GCS_PROJECT_ID}
+      GCS_CREDENTIALS_JSON: ${GCS_CREDENTIALS_JSON}
     depends_on:
       postgres:
         condition: service_healthy

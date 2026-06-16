@@ -73,7 +73,10 @@ jobs:
               "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" \
               "DATABASE_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/${{ secrets.POSTGRES_DB }}" \
               "NODE_ENV=production" \
-              "PORT=3000" > ~/env.prod
+              "PORT=3000" \
+              "GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME }}" \
+              "GCS_PROJECT_ID=${{ secrets.GCS_PROJECT_ID }}" \
+              "GCS_CREDENTIALS_JSON=${{ secrets.GCS_CREDENTIALS_JSON }}" > ~/env.prod
 
             # 根據 docker-compose.prod.yml 抓取最新 Image
             docker compose -f ~/docker-compose.prod.yml --env-file ~/env.prod pull

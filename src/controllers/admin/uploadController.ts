@@ -1,0 +1,35 @@
+import { Controller, Post, Route, Tags, UploadedFile, Response } from "tsoa";
+import { UploadService } from "../../services/uploadService";
+import { ApiResponse } from "../../models/response";
+
+export interface UploadImageResult {
+  url: string;
+}
+
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+@Route("admin/upload")
+@Tags("Admin - Upload")
+export class AdminUploadController extends Controller {
+  private uploadService = new UploadService();
+
+  /**
+   * 上傳圖片到雲端儲存（GCS），回傳公開網址，供文章編輯器插入圖片使用
+   */
+  @Post("image")
+  @Response<{ message: string }>(400, "Invalid file")
+  public async uploadImage(@UploadedFile() file: Express.Multer.File): Promise<ApiResponse<UploadImageResult>> {
+    if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+      this.setStatus(400);
+      throw new Error("不支援的圖片格式，請上傳 JPEG / PNG / WebP / GIF");
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      this.setStatus(400);
+      throw new Error("圖片檔案過大，請小於 5MB");
+    }
+
+    const url = await this.uploadService.uploadImage(file);
+    return { data: { url } };
+  }
+}
