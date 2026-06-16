@@ -6,11 +6,12 @@ const bucketName = process.env.GCS_BUCKET_NAME!;
 
 // 服務帳戶金鑰：本地開發用 GOOGLE_APPLICATION_CREDENTIALS 指向金鑰檔案路徑，
 // 正式環境用 GCS_CREDENTIALS_JSON 直接帶入金鑰 JSON 內容（避免要掛載檔案）。
-const storage = process.env.GCS_CREDENTIALS_JSON
-  ? new Storage({
-      projectId: process.env.GCS_PROJECT_ID,
-      credentials: JSON.parse(process.env.GCS_CREDENTIALS_JSON),
-    })
+const credentials = process.env.GCS_CREDENTIALS_JSON
+  ? JSON.parse(Buffer.from(process.env.GCS_CREDENTIALS_JSON, "base64").toString("utf8"))
+  : undefined;
+
+const storage = credentials
+  ? new Storage({ projectId: process.env.GCS_PROJECT_ID, credentials })
   : new Storage({ projectId: process.env.GCS_PROJECT_ID });
 
 export class UploadService {
