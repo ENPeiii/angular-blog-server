@@ -26,7 +26,8 @@
 10. [API 文件工具：Swagger UI vs ReDoc](#10-api-文件工具swagger-ui-vs-redoc)
 11. [HTTP 狀態碼對照表](#11-http-狀態碼對照表)
 12. [開發指令說明](#12-開發指令說明)
-13. [接下來可以做什麼](#13-接下來可以做什麼)
+13. [圖片上傳與管理系統](#13-圖片上傳與管理系統)
+14. [接下來可以做什麼](#14-接下來可以做什麼)
 
 ---
 
@@ -91,10 +92,11 @@ angular-blog-server/
 │   │   └── response.ts           ← 統一 API 回傳格式 ApiResponse<T>
 │   │
 │   ├── services/        ✏️ 你維護
-│   │   ├── postsService.ts       ← Post CRUD（Prisma / PostgreSQL）
+│   │   ├── postsService.ts       ← Post CRUD（Prisma / PostgreSQL）；delete 時自動清除關聯圖片
 │   │   ├── tagsService.ts        ← Tag CRUD（Prisma / PostgreSQL）
 │   │   ├── topicsService.ts      ← Topic CRUD（Prisma / PostgreSQL）
-│   │   └── bannerService.ts      ← Banner CRUD（Prisma / PostgreSQL）
+│   │   ├── bannerService.ts      ← Banner CRUD（Prisma / PostgreSQL）
+│   │   └── uploadService.ts      ← GCS 圖片上傳、刪除、孤兒清理；上傳後記錄 PostImage
 │   │
 │   ├── controllers/     ✏️ 你維護
 │   │   ├── public/               ← 前台：只有讀取，不需要登入
@@ -106,7 +108,8 @@ angular-blog-server/
 │   │       ├── postsController.ts   (@Route("admin/posts"))
 │   │       ├── tagsController.ts    (@Route("admin/tags"))
 │   │       ├── topicsController.ts  (@Route("admin/topics"))
-│   │       └── bannerController.ts  (@Route("admin/banner"))
+│   │       ├── bannerController.ts  (@Route("admin/banner"))
+│   │       └── uploadController.ts  (@Route("admin/upload"))  ← 圖片上傳 + 孤兒清理
 │   │
 │   ├── middleware/      ✏️ 你維護
 │   │   └── auth.ts               ← 後台身份驗證，檢查 Authorization header
@@ -911,7 +914,122 @@ npm start
 
 ---
 
-## 13. 接下來可以做什麼
+## 13. 圖片上傳與管理系統
+
+### 架構概覽
+
+```
+前端（TUI Editor）
+  貼上 / 拖曳圖片
+       │
+       ▼
+  addImageBlobHook 攔截
+  POST /api/admin/upload/image
+       │
+       ▼
+  AdminUploadController
+  src/controllers/admin/uploadController.ts
+       │
+       ▼
+  UploadService.uploadImage()
+  src/services/uploadService.ts
+    ├── 上傳到 GCS bucket（posts/ 資料夾）
+    └── prisma.postImage.create()  ← postId = null（未關聯）
+       │
+       ▼
+  回傳公開 URL → 插入 Markdown 內文
+       │
+  儲存文章時
+       ▼
+  PostsService.create() / update()
+    ├── 掃描 Markdown 內的 GCS URL
+    ├── updateMany: 新 URL 的 postId = post.id
+    └── updateMany: 移除的 URL 的 postId = null（變孤兒）
+```
+
+### API 端點
+
+| 方法 | 路徑 | 說明 |
+|------|------|------|
+| POST | `/api/admin/upload/image` | 上傳圖片到 GCS，回傳公開 URL；同時建立 PostImage 記錄 |
+| POST | `/api/admin/upload/cleanup` | 刪除 `postId = null` 且超過 1 天的孤兒圖片（GCS + DB） |
+
+### PostImage 資料模型
+
+```prisma
+model PostImage {
+  id        String   @id @default(uuid())
+  url       String   @unique   // 完整 GCS 公開 URL
+  gcsPath   String             // bucket 內路徑（e.g. posts/1234-uuid.jpg），用於刪除
+  postId    String?            // null = 孤兒（未關聯任何文章）
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+}
+```
+
+### 圖片生命週期
+
+| 事件 | 行為 |
+|------|------|
+| **上傳圖片** | GCS 上傳成功 → `PostImage` 建立（`postId = null`） |
+| **儲存 / 更新文章** | 掃描 Markdown 中的 `storage.googleapis.com` URL → 匹配的 `PostImage.postId = post.id`；已移除的 URL → `postId = null` |
+| **刪除文章** | 先從 GCS 刪除所有關聯圖片 → 刪除 `PostImage` 記錄 → 刪除文章 |
+| **清理孤兒** | `POST /api/admin/upload/cleanup` → 刪除 `postId = null` 且 `createdAt < 1 天前` 的圖片（GCS + DB） |
+
+### 環境變數
+
+| 變數 | 說明 |
+|------|------|
+| `GCS_BUCKET_NAME` | GCS bucket 名稱 |
+| `GCS_PROJECT_ID` | GCP 專案 ID |
+| `GCS_CREDENTIALS_JSON` | 服務帳戶金鑰 JSON 的 **Base64** 編碼（正式環境） |
+| `GOOGLE_APPLICATION_CREDENTIALS` | 金鑰檔案路徑，e.g. `./gcs-service-account.json`（本地開發） |
+
+> `GCS_CREDENTIALS_JSON` 必須是 Base64 單行字串，避免 JSON 內的 `"` 和 `\n` 破壞 env 檔格式。
+> 產生指令（PowerShell）：
+> ```powershell
+> [Convert]::ToBase64String([System.IO.File]::ReadAllBytes("path\to\key.json"))
+> ```
+
+### 前端整合（Admin Panel）
+
+- 元件：`src/app/shared/tui-editor/md-editor/md-editor.ts`
+- 透過 `ApiConfiguration.rootUrl` 組合上傳 URL
+  - 開發：proxy `/api` → `http://localhost:3000/api`
+  - 正式：`https://api.enpei.com.tw/api`
+
+### 自動排程（node-cron）
+
+每天凌晨 3 點自動執行孤兒圖片清理，結果印在伺服器 log：
+
+```
+[cron] 孤兒圖片清理完成，共刪除 3 張
+```
+
+**查看 log 的方式：**
+
+本地開發（`npm run dev` 的終端機視窗）：
+```
+# log 直接印在終端機，不需要額外操作
+```
+
+正式環境（GCP VM 上的 Docker 容器）：
+```bash
+# 查看最近 100 行 log（含 cron 輸出）
+docker logs angular_blog_app --tail 100
+
+# 即時追蹤 log（Ctrl+C 離開）
+docker logs angular_blog_app -f
+
+# 只過濾 cron 相關的行
+docker logs angular_blog_app 2>&1 | grep cron
+```
+
+> `angular_blog_app` 是 `docker-compose.prod.yml` 裡定義的 `container_name`。
+
+---
+
+## 14. 接下來可以做什麼
 
 按照難度排序：
 
@@ -935,7 +1053,11 @@ npm start
 3. **新增其他資源**
    - 仿照 posts / tags / banner，詳見 [new-resource.md](new-resource.md)
 
-4. **環境設定** ← 已完成
+4. **圖片上傳系統** ← 已完成
+   - GCS bucket 儲存，`PostImage` 資料表追蹤關聯
+   - 上傳、刪除、孤兒清理全部實作，詳見 [第 13 節](#13-圖片上傳與管理系統)
+
+5. **環境設定** ← 已完成
    - `.env` 已建立，`DATABASE_URL`、`PORT` 皆從環境變數讀取
 
 ---
