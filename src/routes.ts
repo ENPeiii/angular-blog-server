@@ -87,23 +87,33 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PublicTagListItem": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string","required":true},
+            "name": {"dataType":"string","required":true},
+            "postCount": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PaginatedResponse_PublicTagListItem_": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicTagListItem"},"required":true},
+            "total": {"dataType":"double","required":true},
+            "page": {"dataType":"double","required":true},
+            "pageSize": {"dataType":"double","required":true},
+            "totalPages": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PublicTag": {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"string","required":true},
             "name": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "PaginatedResponse_PublicTag_": {
-        "dataType": "refObject",
-        "properties": {
-            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicTag"},"required":true},
-            "total": {"dataType":"double","required":true},
-            "page": {"dataType":"double","required":true},
-            "pageSize": {"dataType":"double","required":true},
-            "totalPages": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -134,6 +144,7 @@ const models: TsoaRoute.Models = {
             "categories": {"ref":"CategoriesType","required":true},
             "topicId": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
             "createdAt": {"dataType":"datetime","required":true},
+            "tags": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicTag"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -723,6 +734,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 pageSize: {"default":10,"in":"query","name":"pageSize","dataType":"double"},
                 categories: {"in":"query","name":"categories","dataType":"string"},
                 topicId: {"in":"query","name":"topicId","dataType":"string"},
+                tagId: {"in":"query","name":"tagId","dataType":"string"},
         };
         app.get('/public/posts',
             ...(fetchMiddlewares<RequestHandler>(PublicPostsController)),

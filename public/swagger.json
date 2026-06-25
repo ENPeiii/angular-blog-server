@@ -146,8 +146,8 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"PublicTag": {
-				"description": "前台公開標籤物件（不含後台管理欄位）",
+			"PublicTagListItem": {
+				"description": "前台標籤列表項目（含文章數，標籤列表頁用）",
 				"properties": {
 					"id": {
 						"type": "string",
@@ -158,21 +158,28 @@
 						"type": "string",
 						"description": "標籤名稱",
 						"example": "TypeScript"
+					},
+					"postCount": {
+						"type": "number",
+						"format": "double",
+						"description": "使用此標籤的文章數",
+						"example": 5
 					}
 				},
 				"required": [
 					"id",
-					"name"
+					"name",
+					"postCount"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"PaginatedResponse_PublicTag_": {
+			"PaginatedResponse_PublicTagListItem_": {
 				"description": "分頁 API 回傳格式",
 				"properties": {
 					"data": {
 						"items": {
-							"$ref": "#/components/schemas/PublicTag"
+							"$ref": "#/components/schemas/PublicTagListItem"
 						},
 						"type": "array"
 					},
@@ -203,6 +210,27 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"PublicTag": {
+				"description": "前台公開標籤物件（不含後台管理欄位）",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "標籤 slug（前端當作路由使用）",
+						"example": "typescript"
+					},
+					"name": {
+						"type": "string",
+						"description": "標籤名稱",
+						"example": "TypeScript"
+					}
+				},
+				"required": [
+					"id",
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"ApiResponse_PublicTag_": {
 				"description": "統一 API 回傳格式",
 				"properties": {
@@ -227,7 +255,7 @@
 				"$ref": "#/components/schemas/_36_Enums.CategoriesType"
 			},
 			"PostListItem": {
-				"description": "文章列表項目（分類頁 / 主題頁用，不含 content 和 tags）",
+				"description": "文章列表項目（分類頁 / 主題頁 / 標籤頁用，不含 content）",
 				"properties": {
 					"id": {
 						"type": "string",
@@ -255,6 +283,13 @@
 						"format": "date-time",
 						"description": "建立時間（UTC）",
 						"example": "2024-01-15T08:30:00.000Z"
+					},
+					"tags": {
+						"items": {
+							"$ref": "#/components/schemas/PublicTag"
+						},
+						"type": "array",
+						"description": "文章標籤列表"
 					}
 				},
 				"required": [
@@ -262,7 +297,8 @@
 					"title",
 					"categories",
 					"topicId",
-					"createdAt"
+					"createdAt",
+					"tags"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -1590,13 +1626,13 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/PaginatedResponse_PublicTag_"
+									"$ref": "#/components/schemas/PaginatedResponse_PublicTagListItem_"
 								}
 							}
 						}
 					}
 				},
-				"description": "取得所有標籤清單",
+				"description": "取得所有標籤清單（含文章數）",
 				"tags": [
 					"Public - Tags"
 				],
@@ -1693,7 +1729,7 @@
 						}
 					}
 				},
-				"description": "取得文章列表（不含內文與標籤），可依分類或主題篩選",
+				"description": "取得文章列表（不含內文，含標籤），可依分類、主題或標籤篩選",
 				"tags": [
 					"Public - Posts"
 				],
@@ -1734,6 +1770,15 @@
 						"description": "主題 slug，不傳則取全部",
 						"in": "query",
 						"name": "topicId",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "標籤 ID，不傳則取全部",
+						"in": "query",
+						"name": "tagId",
 						"required": false,
 						"schema": {
 							"type": "string"

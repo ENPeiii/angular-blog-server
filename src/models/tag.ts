@@ -20,6 +20,12 @@ export interface PublicTag {
   name: string;
 }
 
+/** 前台標籤列表項目（含文章數，標籤列表頁用） */
+export interface PublicTagListItem extends PublicTag {
+  /** 使用此標籤的文章數 @example 5 */
+  postCount: number;
+}
+
 /** 新增標籤時的請求資料 */
 export interface CreateTagDto {
   /** 標籤名稱（必填） @example "TypeScript" */

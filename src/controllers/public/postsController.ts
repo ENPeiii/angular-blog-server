@@ -9,11 +9,12 @@ export class PublicPostsController extends Controller {
   private postsService = new PostsService();
 
   /**
-   * 取得文章列表（不含內文與標籤），可依分類或主題篩選
+   * 取得文章列表（不含內文，含標籤），可依分類、主題或標籤篩選
    * @param page 頁碼（從 1 開始）
    * @param pageSize 每頁筆數
    * @param categories 文章分類（tech | life），不傳則取全部
    * @param topicId 主題 slug，不傳則取全部
+   * @param tagId 標籤 ID，不傳則取全部
    */
   @Get("/")
   public async getPosts(
@@ -21,8 +22,9 @@ export class PublicPostsController extends Controller {
     @Query() pageSize = 10,
     @Query() categories?: string,
     @Query() topicId?: string,
+    @Query() tagId?: string,
   ): Promise<PaginatedResponse<PostListItem>> {
-    const { data, total } = await this.postsService.getList(page, pageSize, categories, topicId);
+    const { data, total } = await this.postsService.getList(page, pageSize, categories, topicId, tagId);
     return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 

@@ -55,7 +55,7 @@ export interface PublicPost {
   tags: PublicTag[];
 }
 
-/** 文章列表項目（分類頁 / 主題頁用，不含 content 和 tags） */
+/** 文章列表項目（分類頁 / 主題頁 / 標籤頁用，不含 content） */
 export interface PostListItem {
   /** 文章唯一識別碼 @example "a1b2c3d4-e5f6-7890-abcd-ef1234567890" */
   id: string;
@@ -67,6 +67,8 @@ export interface PostListItem {
   topicId: string | null;
   /** 建立時間（UTC） @example "2024-01-15T08:30:00.000Z" */
   createdAt: Date;
+  /** 文章標籤列表 */
+  tags: PublicTag[];
 }
 
 /** 首頁最新文章項目（含 tags 和截斷的 content） */

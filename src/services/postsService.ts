@@ -133,6 +133,7 @@ export class PostsService {
     pageSize: number,
     categories?: string,
     topicId?: string,
+    tagId?: string,
   ): Promise<{ data: PostListItem[]; total: number }> {
     const validCategories = Object.values(CategoriesType);
     const where = {
@@ -141,6 +142,7 @@ export class PostsService {
         ? { categories: categories as CategoriesType }
         : {}),
       ...(topicId ? { topicId } : {}),
+      ...(tagId ? { tags: { some: { id: tagId } } } : {}),
     };
 
     const [data, total] = await prisma.$transaction([
@@ -149,7 +151,14 @@ export class PostsService {
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * pageSize,
         take: pageSize,
-        select: { id: true, title: true, categories: true, topicId: true, createdAt: true },
+        select: {
+          id: true,
+          title: true,
+          categories: true,
+          topicId: true,
+          createdAt: true,
+          tags: { select: { id: true, name: true } },
+        },
       }),
       prisma.post.count({ where }),
     ]);
