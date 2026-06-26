@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { toSlug } from "../lib/slug";
+import { stripMarkdown } from "../lib/markdown";
 import { CategoriesType, CreatePostDto, Post, PostLatestItem, PostListItem, UpdatePostDto } from "../models/post";
 import { prisma } from "../lib/prisma";
 import { UploadService } from "./uploadService";
@@ -182,7 +183,7 @@ export class PostsService {
     });
     return posts.map(post => ({
       ...post,
-      content: post.content.slice(0, 100),
+      content: stripMarkdown(post.content).slice(0, 100),
     }));
   }
 
