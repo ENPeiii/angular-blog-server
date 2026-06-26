@@ -65,6 +65,8 @@ export interface PostListItem {
   categories: CategoriesType;
   /** 所屬主題 ID @example "vue-series" */
   topicId: string | null;
+  /** 所屬主題 */
+  topic: PublicTopic | null;
   /** 建立時間（UTC） @example "2024-01-15T08:30:00.000Z" */
   createdAt: Date;
   /** 文章標籤列表 */

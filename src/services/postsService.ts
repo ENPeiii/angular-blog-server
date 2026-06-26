@@ -158,6 +158,7 @@ export class PostsService {
           topicId: true,
           createdAt: true,
           tags: { select: { id: true, name: true } },
+          topic: { select: { id: true, name: true, description: true } },
         },
       }),
       prisma.post.count({ where }),

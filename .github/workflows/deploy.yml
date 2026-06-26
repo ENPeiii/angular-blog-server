@@ -1,4 +1,4 @@
-name: Deploy Image to GCP
+name: Deploy API to GCP
 
 on:
   workflow_run:

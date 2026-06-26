@@ -278,6 +278,15 @@
 						"description": "所屬主題 ID",
 						"example": "vue-series"
 					},
+					"topic": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/PublicTopic"
+							}
+						],
+						"nullable": true,
+						"description": "所屬主題"
+					},
 					"createdAt": {
 						"type": "string",
 						"format": "date-time",
@@ -297,6 +306,7 @@
 					"title",
 					"categories",
 					"topicId",
+					"topic",
 					"createdAt",
 					"tags"
 				],
