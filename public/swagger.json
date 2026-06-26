@@ -607,6 +607,44 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"CleanupLogItem": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"deletedCount": {
+						"type": "number",
+						"format": "double"
+					},
+					"ranAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"id",
+					"deletedCount",
+					"ranAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_CleanupLogItem-Array_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/CleanupLogItem"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Topic": {
 				"description": "後台完整主題物件",
 				"properties": {
@@ -1975,6 +2013,59 @@
 				],
 				"security": [],
 				"parameters": []
+			}
+		},
+		"/admin/upload/cleanup-logs": {
+			"get": {
+				"operationId": "GetCleanupLogs",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_CleanupLogItem-Array_"
+								}
+							}
+						}
+					}
+				},
+				"description": "查詢孤兒圖片清理紀錄",
+				"tags": [
+					"Admin - Upload"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"delete": {
+				"operationId": "DeleteCleanupLogs",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_CleanupResult_"
+								}
+							}
+						}
+					}
+				},
+				"description": "刪除指定日期以前的孤兒圖片清理紀錄",
+				"tags": [
+					"Admin - Upload"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "before",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/admin/topics": {

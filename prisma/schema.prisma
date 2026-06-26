@@ -63,6 +63,12 @@ model PostImage {
   createdAt DateTime @default(now())
 }
 
+model CleanupLog {
+  id           String   @id @default(uuid())
+  deletedCount Int
+  ranAt        DateTime @default(now())
+}
+
 model Tag {
   id        String   @id
   name      String   @unique

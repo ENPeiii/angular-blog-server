@@ -50,6 +50,20 @@ export class UploadService {
       where: { id: { in: orphans.map((o) => o.id) } },
     });
 
+    await prisma.cleanupLog.create({ data: { deletedCount: orphans.length } });
+
     return orphans.length;
+  }
+
+  async listCleanupLogs() {
+    return prisma.cleanupLog.findMany({ orderBy: { ranAt: "desc" } });
+  }
+
+  // 刪除指定日期以前的孤兒圖片清理紀錄
+  async deleteCleanupLogsBefore(before: Date): Promise<number> {
+    const result = await prisma.cleanupLog.deleteMany({
+      where: { ranAt: { lt: before } },
+    });
+    return result.count;
   }
 }

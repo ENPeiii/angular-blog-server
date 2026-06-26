@@ -1,9 +1,10 @@
-import { Controller, Post, Route, Tags, UploadedFile, Response } from "tsoa";
+import { Controller, Post, Get, Delete, Query, Route, Tags, UploadedFile, Response } from "tsoa";
 import { UploadService } from "../../services/uploadService";
 import { ApiResponse } from "../../models/response";
 
 export interface UploadImageResult { url: string; }
 export interface CleanupResult { deleted: number; }
+export interface CleanupLogItem { id: string; deletedCount: number; ranAt: Date; }
 
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -37,6 +38,24 @@ export class AdminUploadController extends Controller {
   @Post("cleanup")
   public async cleanupOrphanImages(): Promise<ApiResponse<CleanupResult>> {
     const deleted = await this.uploadService.cleanupOrphanImages();
+    return { data: { deleted } };
+  }
+
+  /**
+   * 查詢孤兒圖片清理紀錄
+   */
+  @Get("cleanup-logs")
+  public async getCleanupLogs(): Promise<ApiResponse<CleanupLogItem[]>> {
+    const logs = await this.uploadService.listCleanupLogs();
+    return { data: logs };
+  }
+
+  /**
+   * 刪除指定日期以前的孤兒圖片清理紀錄
+   */
+  @Delete("cleanup-logs")
+  public async deleteCleanupLogs(@Query() before: string): Promise<ApiResponse<CleanupResult>> {
+    const deleted = await this.uploadService.deleteCleanupLogsBefore(new Date(before));
     return { data: { deleted } };
   }
 }

@@ -269,6 +269,24 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CleanupLogItem": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string","required":true},
+            "deletedCount": {"dataType":"double","required":true},
+            "ranAt": {"dataType":"datetime","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_CleanupLogItem-Array_": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"CleanupLogItem"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Topic": {
         "dataType": "refObject",
         "properties": {
@@ -906,6 +924,65 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'cleanupOrphanImages',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminUploadController_getCleanupLogs: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/admin/upload/cleanup-logs',
+            ...(fetchMiddlewares<RequestHandler>(AdminUploadController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminUploadController.prototype.getCleanupLogs)),
+
+            async function AdminUploadController_getCleanupLogs(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminUploadController_getCleanupLogs, request, response });
+
+                const controller = new AdminUploadController();
+
+              await templateService.apiHandler({
+                methodName: 'getCleanupLogs',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAdminUploadController_deleteCleanupLogs: Record<string, TsoaRoute.ParameterSchema> = {
+                before: {"in":"query","name":"before","required":true,"dataType":"string"},
+        };
+        app.delete('/admin/upload/cleanup-logs',
+            ...(fetchMiddlewares<RequestHandler>(AdminUploadController)),
+            ...(fetchMiddlewares<RequestHandler>(AdminUploadController.prototype.deleteCleanupLogs)),
+
+            async function AdminUploadController_deleteCleanupLogs(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAdminUploadController_deleteCleanupLogs, request, response });
+
+                const controller = new AdminUploadController();
+
+              await templateService.apiHandler({
+                methodName: 'deleteCleanupLogs',
                 controller,
                 response,
                 next,
