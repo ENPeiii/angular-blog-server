@@ -41,9 +41,9 @@ PORT=3000
 
 ---
 
-## Step 2：了解 docker-compose.yml
+## Step 2：了解 docker-compose.prod.yml
 
-專案根目錄的 `docker-compose.yml` 定義了兩個 service：
+專案根目錄的 `docker-compose.prod.yml` 定義了兩個 service：
 
 ```yaml
 services:
@@ -204,7 +204,7 @@ netstat -ano | findstr :5432
 docker ps -a | findstr postgres
 ```
 
-**解法**：停掉佔用的服務，或改 `docker-compose.yml` 的 port 映射（`.env` 同步修改）：
+**解法**：停掉佔用的服務，或改 `docker-compose.prod.yml` 的 port 映射（`.env` 同步修改）：
 
 ```yaml
 ports:

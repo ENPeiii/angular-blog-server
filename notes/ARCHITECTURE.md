@@ -141,7 +141,7 @@ angular-blog-server/
 │   ├── new-resource.md           ← 開發日常：新增資源、欄位、常用 Prisma 指令
 │   └── database.vuerd            ← DB ER 圖設計檔（用 vuerd 開啟）
 │
-├── docker-compose.yml   ✏️ 你維護 — PostgreSQL 容器設定
+├── docker-compose.prod.yml   ✏️ 你維護 — PostgreSQL 容器設定
 ├── prisma.config.ts     ✏️ 你維護 — Prisma 7 必要設定（見下方說明）
 ├── tsoa.json            ✏️ 你維護 — Tsoa 的設定
 ├── tsconfig.json        ✏️ 你維護 — TypeScript 的設定
