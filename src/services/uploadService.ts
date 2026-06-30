@@ -33,11 +33,20 @@ export class UploadService {
     await storage.bucket(bucketName).file(gcsPath).delete({ ignoreNotFound: true });
   }
 
-  // 刪除超過 1 天且未關聯任何文章的孤兒圖片
+  // 刪除超過 1 天、未關聯任何文章、且未被任何 Banner 使用的孤兒圖片
   async cleanupOrphanImages(): Promise<number> {
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    // 取得所有 Banner 正在使用的圖片網址，排除在外
+    const banners = await prisma.banner.findMany({ select: { imgUrl: true } });
+    const bannerUrls = banners.map((b) => b.imgUrl);
+
     const orphans = await prisma.postImage.findMany({
-      where: { postId: null, createdAt: { lt: cutoff } },
+      where: {
+        postId: null,
+        createdAt: { lt: cutoff },
+        ...(bannerUrls.length > 0 ? { url: { notIn: bannerUrls } } : {}),
+      },
     });
 
     await Promise.allSettled(

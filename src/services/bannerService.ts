@@ -54,9 +54,7 @@ export class BannerService {
 
   async delete(id: string): Promise<boolean> {
     try {
-      await prisma.banner.delete({
-        where: { id },
-      });
+      await prisma.banner.delete({ where: { id } });
       return true;
     } catch {
       return false;

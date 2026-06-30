@@ -15,7 +15,7 @@ export class AdminUploadController extends Controller {
   private uploadService = new UploadService();
 
   /**
-   * 上傳圖片到雲端儲存（GCS），回傳公開網址，供文章編輯器插入圖片使用
+   * 上傳圖片到雲端儲存（GCS），回傳公開網址，供文章編輯器或 Banner 插入圖片使用
    */
   @Post("image")
   @Response<{ message: string }>(400, "Invalid file")
@@ -33,7 +33,7 @@ export class AdminUploadController extends Controller {
   }
 
   /**
-   * 清除超過 1 天且未關聯任何文章的孤兒圖片（GCS + DB）
+   * 清除超過 1 天且未關聯任何文章、也未被 Banner 使用的孤兒圖片（GCS + DB）
    */
   @Post("cleanup")
   public async cleanupOrphanImages(): Promise<ApiResponse<CleanupResult>> {

@@ -556,6 +556,45 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"About": {
+				"properties": {
+					"id": {
+						"type": "string",
+						"example": "singleton"
+					},
+					"content": {
+						"type": "string",
+						"description": "關於我的 Markdown 內容",
+						"example": "# 關於我\n..."
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "最後更新時間（UTC）",
+						"example": "2024-01-20T12:00:00.000Z"
+					}
+				},
+				"required": [
+					"id",
+					"content",
+					"updatedAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResponse_About_": {
+				"description": "統一 API 回傳格式",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/About"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"UploadImageResult": {
 				"properties": {
 					"url": {
@@ -1504,6 +1543,20 @@
 				},
 				"type": "object",
 				"additionalProperties": false
+			},
+			"UpdateAboutDto": {
+				"properties": {
+					"content": {
+						"type": "string",
+						"description": "關於我的 Markdown 內容",
+						"example": "# 關於我\n..."
+					}
+				},
+				"required": [
+					"content"
+				],
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {}
@@ -1932,6 +1985,29 @@
 				"parameters": []
 			}
 		},
+		"/public/about": {
+			"get": {
+				"operationId": "GetAbout",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_About_"
+								}
+							}
+						}
+					}
+				},
+				"description": "取得關於我頁面內容",
+				"tags": [
+					"Public - About"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/admin/upload/image": {
 			"post": {
 				"operationId": "UploadImage",
@@ -1965,7 +2041,7 @@
 						}
 					}
 				},
-				"description": "上傳圖片到雲端儲存（GCS），回傳公開網址，供文章編輯器插入圖片使用",
+				"description": "上傳圖片到雲端儲存（GCS），回傳公開網址，供文章編輯器或 Banner 插入圖片使用",
 				"tags": [
 					"Admin - Upload"
 				],
@@ -2007,7 +2083,7 @@
 						}
 					}
 				},
-				"description": "清除超過 1 天且未關聯任何文章的孤兒圖片（GCS + DB）",
+				"description": "清除超過 1 天且未關聯任何文章、也未被 Banner 使用的孤兒圖片（GCS + DB）",
 				"tags": [
 					"Admin - Upload"
 				],
@@ -3054,6 +3130,60 @@
 						}
 					}
 				]
+			}
+		},
+		"/admin/about": {
+			"get": {
+				"operationId": "GetAbout",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_About_"
+								}
+							}
+						}
+					}
+				},
+				"description": "取得關於我頁面內容（後台編輯用）",
+				"tags": [
+					"Admin - About"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"put": {
+				"operationId": "UpdateAbout",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_About_"
+								}
+							}
+						}
+					}
+				},
+				"description": "更新關於我頁面內容",
+				"tags": [
+					"Admin - About"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateAboutDto"
+							}
+						}
+					}
+				}
 			}
 		}
 	},

@@ -63,6 +63,12 @@ model PostImage {
   createdAt DateTime @default(now())
 }
 
+model About {
+  id        String   @id @default("singleton")
+  content   String   @default("")
+  updatedAt DateTime @updatedAt
+}
+
 model CleanupLog {
   id           String   @id @default(uuid())
   deletedCount Int
@@ -88,8 +94,8 @@ model Banner {
   type      BannerType
   imgUrl    String
   imgAlt    String
-  isActive  Boolean  @default(false)
+  isActive  Boolean    @default(false)
   content   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
