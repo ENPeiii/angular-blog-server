@@ -31,6 +31,9 @@ services:
       GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
       GCS_PROJECT_ID: ${GCS_PROJECT_ID}
       GCS_CREDENTIALS_JSON: ${GCS_CREDENTIALS_JSON}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
     depends_on:
       postgres:
         condition: service_healthy
