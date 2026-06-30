@@ -76,7 +76,10 @@ jobs:
               "PORT=3000" \
               "GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME }}" \
               "GCS_PROJECT_ID=${{ secrets.GCS_PROJECT_ID }}" \
-              "GCS_CREDENTIALS_JSON=${{ secrets.GCS_CREDENTIALS_JSON }}" > ~/env.prod
+              "GCS_CREDENTIALS_JSON=${{ secrets.GCS_CREDENTIALS_JSON }}" \
+              "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
+              "ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}" \
+              "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" > ~/env.prod
 
             # 根據 docker-compose.prod.yml 抓取最新 Image
             docker compose -f ~/docker-compose.prod.yml --env-file ~/env.prod pull
