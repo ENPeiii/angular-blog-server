@@ -4,8 +4,10 @@ import { stripMarkdown } from "../lib/markdown";
 import { CategoriesType, CreatePostDto, Post, PostLatestItem, PostListItem, UpdatePostDto } from "../models/post";
 import { prisma } from "../lib/prisma";
 import { UploadService } from "./uploadService";
+import { AlgoliaService } from "./algoliaService";
 
 const uploadService = new UploadService();
+const algoliaService = new AlgoliaService();
 
 function extractGcsImageUrls(content: string): string[] {
   const regex = /https:\/\/storage\.googleapis\.com\/[^\s)"]+/g;
@@ -68,6 +70,10 @@ export class PostsService {
         });
       }
 
+      if (post.status === "published") {
+        await algoliaService.syncPost(post);
+      }
+
       return post;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2003') {
@@ -121,6 +127,12 @@ export class PostsService {
           where: { postId: id, url: { notIn: newUrls } },
           data: { postId: null },
         });
+      }
+
+      if (updated.status === "published") {
+        await algoliaService.syncPost(updated);
+      } else {
+        await algoliaService.removePost(id);
       }
 
       return updated;
@@ -189,6 +201,7 @@ export class PostsService {
 
   async delete(id: string): Promise<boolean> {
     try {
+      await algoliaService.removePost(id);
       const images = await prisma.postImage.findMany({ where: { postId: id } });
       await Promise.allSettled(images.map((img) => uploadService.deleteImage(img.gcsPath)));
       await prisma.postImage.deleteMany({ where: { postId: id } });
