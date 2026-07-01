@@ -19,7 +19,7 @@ export class TagsService {
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * pageSize,
         take: pageSize,
-        include: { _count: { select: { posts: true } } },
+        include: { _count: { select: { posts: { where: { status: 'published' } } } } },
       }),
       prisma.tag.count({ where }),
     ]);
@@ -35,7 +35,7 @@ export class TagsService {
   async getById(id: string): Promise<Tag | undefined> {
     const raw = await prisma.tag.findUnique({
       where: { id },
-      include: { _count: { select: { posts: true } } },
+      include: { _count: { select: { posts: { where: { status: 'published' } } } } },
     });
     if (!raw) return undefined;
     const { _count, ...tag } = raw;
@@ -46,7 +46,7 @@ export class TagsService {
     try {
       const raw = await prisma.tag.create({
         data: { id: toSlug(dto.name), name: dto.name },
-        include: { _count: { select: { posts: true } } },
+        include: { _count: { select: { posts: { where: { status: 'published' } } } } },
       });
       const { _count, ...tag } = raw;
       return { ...tag, postCount: _count.posts };
@@ -63,7 +63,7 @@ export class TagsService {
       const raw = await prisma.tag.update({
         where: { id },
         data: dto,
-        include: { _count: { select: { posts: true } } },
+        include: { _count: { select: { posts: { where: { status: 'published' } } } } },
       });
       const { _count, ...tag } = raw;
       return { ...tag, postCount: _count.posts };
