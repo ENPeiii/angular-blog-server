@@ -8,10 +8,13 @@ export class TagsService {
     page: number,
     pageSize: number,
     search?: string,
+    onlyPublished = false,
   ): Promise<{ data: Tag[]; total: number }> {
     const where = search
       ? { name: { contains: search, mode: 'insensitive' as const } }
       : {};
+
+    const postCountWhere = onlyPublished ? { where: { status: 'published' as const } } : true;
 
     const [rawData, total] = await prisma.$transaction([
       prisma.tag.findMany({
@@ -19,7 +22,7 @@ export class TagsService {
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * pageSize,
         take: pageSize,
-        include: { _count: { select: { posts: { where: { status: 'published' } } } } },
+        include: { _count: { select: { posts: postCountWhere } } },
       }),
       prisma.tag.count({ where }),
     ]);
@@ -35,7 +38,7 @@ export class TagsService {
   async getById(id: string): Promise<Tag | undefined> {
     const raw = await prisma.tag.findUnique({
       where: { id },
-      include: { _count: { select: { posts: { where: { status: 'published' } } } } },
+      include: { _count: { select: { posts: true } } },
     });
     if (!raw) return undefined;
     const { _count, ...tag } = raw;
@@ -46,7 +49,7 @@ export class TagsService {
     try {
       const raw = await prisma.tag.create({
         data: { id: toSlug(dto.name), name: dto.name },
-        include: { _count: { select: { posts: { where: { status: 'published' } } } } },
+        include: { _count: { select: { posts: true } } },
       });
       const { _count, ...tag } = raw;
       return { ...tag, postCount: _count.posts };
@@ -63,7 +66,7 @@ export class TagsService {
       const raw = await prisma.tag.update({
         where: { id },
         data: dto,
-        include: { _count: { select: { posts: { where: { status: 'published' } } } } },
+        include: { _count: { select: { posts: true } } },
       });
       const { _count, ...tag } = raw;
       return { ...tag, postCount: _count.posts };

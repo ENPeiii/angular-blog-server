@@ -18,7 +18,7 @@ export class PublicTagsController extends Controller {
     @Query() page = 1,
     @Query() pageSize = 10,
   ): Promise<PaginatedResponse<PublicTagListItem>> {
-    const { data, total } = await this.tagsService.getAll(page, pageSize);
+    const { data, total } = await this.tagsService.getAll(page, pageSize, undefined, true);
     return {
       data: data.map(({ id, name, postCount }) => ({ id, name, postCount })),
       total,
