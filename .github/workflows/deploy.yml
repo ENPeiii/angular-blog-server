@@ -80,6 +80,7 @@ jobs:
               "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
               "ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}" \
               "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" \
+              "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" \
               "ALGOLIA_APP_ID=${{ secrets.ALGOLIA_APP_ID }}" \
               "ALGOLIA_ADMIN_API_KEY=${{ secrets.ALGOLIA_ADMIN_API_KEY }}" \
               "ALGOLIA_INDEX_NAME=blog-post" \

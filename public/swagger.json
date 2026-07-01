@@ -595,6 +595,30 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"AuthResponse": {
+				"properties": {
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GoogleLoginDto": {
+				"properties": {
+					"credential": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"credential"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"UploadImageResult": {
 				"properties": {
 					"url": {
@@ -1544,6 +1568,34 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"PolishContentResponse": {
+				"properties": {
+					"polished": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"polished"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PolishContentDto": {
+				"properties": {
+					"title": {
+						"type": "string"
+					},
+					"content": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"title",
+					"content"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"UpdateAboutDto": {
 				"properties": {
 					"content": {
@@ -2006,6 +2058,39 @@
 				],
 				"security": [],
 				"parameters": []
+			}
+		},
+		"/auth/google": {
+			"post": {
+				"operationId": "GoogleLogin",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "使用 Google ID Token 登入後台，成功後回傳 JWT",
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GoogleLoginDto"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/admin/upload/image": {
@@ -3130,6 +3215,39 @@
 						}
 					}
 				]
+			}
+		},
+		"/admin/ai/polish": {
+			"post": {
+				"operationId": "PolishContent",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PolishContentResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "使用 Claude AI 潤飾文章（修正語法、讓文字更流暢），回傳潤飾後的 Markdown",
+				"tags": [
+					"Admin - AI"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PolishContentDto"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/admin/about": {

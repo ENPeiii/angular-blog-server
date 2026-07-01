@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/ENPeiii/angular-blog-server#readme",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.109.0",
     "@google-cloud/storage": "^7.21.0",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
