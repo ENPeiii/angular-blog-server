@@ -10,9 +10,14 @@ export class TagsService {
     search?: string,
     onlyPublished = false,
   ): Promise<{ data: Tag[]; total: number }> {
-    const where = search
-      ? { name: { contains: search, mode: 'insensitive' as const } }
-      : {};
+    const publishedFilter = onlyPublished
+      ? { status: 'published' as const }
+      : undefined;
+
+    const where = {
+      ...(search ? { name: { contains: search, mode: 'insensitive' as const } } : {}),
+      ...(publishedFilter ? { posts: { some: publishedFilter } } : {}),
+    };
 
     const postCountWhere = onlyPublished ? { where: { status: 'published' as const } } : true;
 
