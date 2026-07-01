@@ -79,7 +79,11 @@ jobs:
               "GCS_CREDENTIALS_JSON=${{ secrets.GCS_CREDENTIALS_JSON }}" \
               "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
               "ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}" \
-              "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" > ~/env.prod
+              "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" \
+              "ALGOLIA_APP_ID=${{ secrets.ALGOLIA_APP_ID }}" \
+              "ALGOLIA_ADMIN_API_KEY=${{ secrets.ALGOLIA_ADMIN_API_KEY }}" \
+              "ALGOLIA_INDEX_NAME=blog-post" \
+              "FRONTEND_URL=https://enpei.com.tw" > ~/env.prod
 
             # 根據 docker-compose.prod.yml 抓取最新 Image
             docker compose -f ~/docker-compose.prod.yml --env-file ~/env.prod pull

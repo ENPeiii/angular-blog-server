@@ -34,6 +34,10 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      ALGOLIA_APP_ID: ${ALGOLIA_APP_ID}
+      ALGOLIA_ADMIN_API_KEY: ${ALGOLIA_ADMIN_API_KEY}
+      ALGOLIA_INDEX_NAME: ${ALGOLIA_INDEX_NAME:-blog-post}
+      FRONTEND_URL: ${FRONTEND_URL:-https://enpei.com.tw}
     depends_on:
       postgres:
         condition: service_healthy
