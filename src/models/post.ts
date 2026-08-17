@@ -103,6 +103,8 @@ export interface CreatePostDto {
   status?: PostStatus;
   /** 所屬主題 ID @example "vue-series" */
   topicId?: string;
+  /** 所屬章節 ID @example "b2c3d4e5-..." */
+  topicSectionId?: string;
   /** 標籤名稱清單，tag 不存在時自動建立 @example ["TypeScript", "Vue 3"] */
   tags?: string[];
 }
@@ -119,6 +121,8 @@ export interface UpdatePostDto {
   status?: PostStatus;
   /** 所屬主題 ID（傳 null 可解除關聯） @example "vue-series" */
   topicId?: string | null;
+  /** 所屬章節 ID（傳 null 可解除關聯） @example "b2c3d4e5-..." */
+  topicSectionId?: string | null;
   /** 傳入則完整替換文章的 tag 列表 @example ["TypeScript"] */
   tags?: string[];
 }
