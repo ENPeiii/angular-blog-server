@@ -83,6 +83,8 @@ export interface PostLatestItem {
   categories: CategoriesType;
   /** 文章內文前 100 字 @example "這是文章內容的前一百個字..." */
   content: string;
+  /** 所屬主題 ID（null 表示非主題文章） @example "vue-series" */
+  topicId: string | null;
   /** 文章標籤列表 */
   tags: PublicTag[];
   /** 建立時間（UTC） @example "2024-01-15T08:30:00.000Z" */

@@ -189,6 +189,7 @@ export class PostsService {
         title: true,
         categories: true,
         content: true,
+        topicId: true,
         createdAt: true,
         tags: { select: { id: true, name: true } },
       },

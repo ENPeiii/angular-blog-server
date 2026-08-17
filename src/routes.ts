@@ -177,6 +177,7 @@ const models: TsoaRoute.Models = {
             "title": {"dataType":"string","required":true},
             "categories": {"ref":"CategoriesType","required":true},
             "content": {"dataType":"string","required":true},
+            "topicId": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
             "tags": {"dataType":"array","array":{"dataType":"refObject","ref":"PublicTag"},"required":true},
             "createdAt": {"dataType":"datetime","required":true},
         },

@@ -372,6 +372,12 @@
 						"description": "文章內文前 100 字",
 						"example": "這是文章內容的前一百個字..."
 					},
+					"topicId": {
+						"type": "string",
+						"nullable": true,
+						"description": "所屬主題 ID（null 表示非主題文章）",
+						"example": "vue-series"
+					},
 					"tags": {
 						"items": {
 							"$ref": "#/components/schemas/PublicTag"
@@ -391,6 +397,7 @@
 					"title",
 					"categories",
 					"content",
+					"topicId",
 					"tags",
 					"createdAt"
 				],
